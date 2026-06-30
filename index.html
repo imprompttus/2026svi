@@ -1,0 +1,1765 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>SVI 서류검토(동남권)</title>
+  <style>
+    :root {
+      --bg: #f6f7f3;
+      --panel: #ffffff;
+      --ink: #18201c;
+      --muted: #66706b;
+      --line: #dfe4dc;
+      --green: #176b4d;
+      --green-soft: #e4f3ea;
+      --red: #b42318;
+      --red-soft: #fde9e7;
+      --amber: #a15c07;
+      --amber-soft: #fff1d6;
+      --blue: #1e5aa8;
+      --blue-soft: #e6effb;
+      --gray-soft: #eef1ed;
+      --shadow: 0 18px 50px rgba(22, 34, 28, 0.09);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", "Pretendard", "Noto Sans KR", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body.locked .app {
+      display: none;
+    }
+
+    body.unlocked .auth-screen {
+      display: none;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .auth-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(23, 107, 77, 0.12), rgba(30, 90, 168, 0.08)),
+        var(--bg);
+    }
+
+    .auth-card {
+      width: min(420px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .auth-title {
+      display: grid;
+      gap: 7px;
+    }
+
+    .auth-title h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .auth-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .auth-error {
+      min-height: 18px;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .brand {
+      display: grid;
+      gap: 8px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 0;
+      color: #becac2;
+      font-size: 14px;
+    }
+
+    .side-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .side-label {
+      color: #a9b8ae;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rounds {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(110px, 1fr));
+      gap: 8px;
+    }
+
+    .round-btn {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .round-btn.active {
+      background: #173f30;
+      color: #ffffff;
+      border-color: #173f30;
+    }
+
+    .round-btn span:last-child {
+      font-variant-numeric: tabular-nums;
+      color: inherit;
+      opacity: 0.78;
+    }
+
+    .mini-stat {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      color: #dce5df;
+      font-size: 14px;
+    }
+
+    .mini-stat strong {
+      font-size: 18px;
+      color: #ffffff;
+    }
+
+    main {
+      min-width: 0;
+      padding: 26px 30px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .title-block h2 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .title-block p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+
+    .btn.shortcut {
+      color: #0f3d2d;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .btn.shortcut .icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--green);
+    }
+
+    .btn.shortcut svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(30, 90, 168, 0.24);
+      outline-offset: 2px;
+    }
+
+    .toolbar {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1.4fr repeat(4, minmax(140px, 0.55fr));
+      gap: 10px;
+    }
+
+    .round-filter {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .round-filter-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .field input, .field select, .field textarea {
+      min-width: 0;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 10px;
+      height: 38px;
+    }
+
+    .field textarea {
+      min-height: 130px;
+      height: auto;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      min-height: 72px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .metric strong {
+      font-size: 24px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 14px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .stats-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .stats-panel.wide {
+      grid-column: 1 / -1;
+    }
+
+    .stats-title {
+      margin: 0;
+      padding: 12px 14px;
+      background: #d8ded7;
+      border-bottom: 1px solid #b9c2bb;
+      color: #14211a;
+      font-size: 15px;
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .stats-scroll {
+      overflow: auto;
+      width: 100%;
+    }
+
+    .stats-table {
+      width: 100%;
+      min-width: 0;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .stats-table th,
+    .stats-table td {
+      border: 1px solid #c9d2cb;
+      padding: 7px 9px;
+      text-align: center;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stats-table th {
+      position: static;
+      background: #d9ebfa;
+      color: #071d30;
+      font-size: 13px;
+      z-index: auto;
+    }
+
+    .stats-table .row-head,
+    .stats-table .total-head {
+      background: #d9ebfa;
+      color: #071d30;
+      font-weight: 900;
+    }
+
+    .stats-table .total-row th,
+    .stats-table .total-row td {
+      font-weight: 900;
+      background: #f8fbfd;
+    }
+
+    .stats-note {
+      padding: 10px 14px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--line);
+      line-height: 1.45;
+    }
+
+    .content-grid {
+      display: grid;
+      gap: 14px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .table-wrap, .modal-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .table-head {
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .table-head h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .source-state {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .table-scroll {
+      overflow: auto;
+      width: 100%;
+      max-height: calc(100vh - 300px);
+      min-height: 520px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1680px;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f9fbf8;
+      color: #48534d;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #fbfcfa;
+    }
+
+    .company {
+      font-weight: 800;
+      color: #16221c;
+      max-width: 250px;
+    }
+
+    .owner-select {
+      width: 138px;
+      min-width: 118px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 7px 8px;
+      height: 34px;
+      font-size: 12px;
+    }
+
+    .owner-cell {
+      display: grid;
+      gap: 4px;
+      min-width: 150px;
+    }
+
+    .history-row {
+      background: #f8faf6;
+    }
+
+    .history-owner-text {
+      color: #245343;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .current-row td {
+      background: #fff;
+    }
+
+    .current-row .company,
+    .current-row td:nth-child(4) {
+      color: #001f18;
+      font-weight: 900;
+    }
+
+    .current-row td:first-child {
+      box-shadow: inset 4px 0 0 var(--green);
+    }
+
+    .coaching-check {
+      inline-size: 18px;
+      block-size: 18px;
+      accent-color: var(--green);
+      cursor: pointer;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .pill.done { background: var(--green-soft); color: var(--green); }
+    .pill.review { background: var(--blue-soft); color: var(--blue); }
+    .pill.wait { background: var(--gray-soft); color: #4e5954; }
+    .pill.history { background: #eef3ee; color: #53605a; font-weight: 800; }
+    .pill.warn { background: var(--amber-soft); color: var(--amber); }
+    .pill.danger { background: var(--red-soft); color: var(--red); }
+
+    .empty {
+      padding: 32px 14px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 18, 0.42);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 10;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-panel {
+      width: min(760px, 100%);
+      max-height: min(720px, calc(100vh - 40px));
+      overflow: auto;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .stats-modal-panel {
+      width: min(1120px, 100%);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1180px) {
+      .rounds {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .cards {
+        grid-template-columns: repeat(3, minmax(140px, 1fr));
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .table-scroll {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      main { padding: 16px; }
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+      .actions {
+        justify-content: flex-start;
+      }
+      .rounds, .toolbar, .cards, .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .title-block h2 {
+        font-size: 23px;
+      }
+      .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body class="locked">
+  <section class="auth-screen" aria-label="비밀번호 입력">
+    <div class="auth-card">
+      <div class="auth-title">
+        <h1>SVI 동남권<br>서류검토 현황</h1>
+        <p>비밀번호를 입력하면 접수 현황을 확인할 수 있습니다.</p>
+      </div>
+      <form class="auth-form" id="authForm">
+        <div class="field">
+          <label for="passwordInput">비밀번호</label>
+          <input id="passwordInput" type="password" inputmode="numeric" autocomplete="current-password" placeholder="비밀번호 입력">
+        </div>
+        <button class="btn primary" type="submit">확인</button>
+        <div class="auth-error" id="authError" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
+  <div class="app">
+    <main>
+      <section class="topbar">
+        <div class="title-block">
+          <h2>SVI 동남권 서류검토 현황</h2>
+          <p id="subtitle">오늘 기준 일정과 보완 마감 상태를 확인합니다.</p>
+        </div>
+        <div class="actions">
+          <a class="btn shortcut" href="https://www.seis.or.kr/svi/si/mn/siMainPage.do" target="_blank" rel="noopener noreferrer">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>
+            사회적가치 포털
+          </a>
+          <a class="btn shortcut" href="https://docs.google.com/spreadsheets/d/1qNWCt306t_ChoGoGQyKcDeUnDvlKvvAazMyP89nM-Zw/edit?gid=1596603889#gid=1596603889" target="_blank" rel="noopener noreferrer">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span>
+            상담일지
+          </a>
+          <a class="btn shortcut" href="https://drive.google.com/drive/folders/1HA87TV8yG90jJNT_gI9t_F8D4x9M9ZHZ" target="_blank" rel="noopener noreferrer">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8 12 3 7 8"/><path d="M12 3v12"/></svg></span>
+            심화코칭 업로드
+          </a>
+          <a class="btn shortcut" href="https://svi-sobdcoop.vercel.app/" target="_blank" rel="noopener noreferrer">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M18 3v5h5"/></svg></span>
+            SVI 모의진단
+          </a>
+          <button class="btn" id="statsBtn" type="button">통계</button>
+          <button class="btn primary" id="csvBtn" type="button">추가</button>
+        </div>
+      </section>
+
+      <section class="round-filter" aria-label="차수 필터">
+        <div class="round-filter-label">차수</div>
+        <div class="rounds" id="roundButtons"></div>
+      </section>
+
+      <section class="toolbar" aria-label="필터">
+        <div class="field">
+          <label for="searchInput">검색</label>
+          <input id="searchInput" type="search" placeholder="기업명, 지역, 담당자, 측정자">
+        </div>
+        <div class="field">
+          <label for="statusFilter">상태</label>
+          <select id="statusFilter">
+            <option value="all">전체</option>
+            <option value="overdue">마감지연</option>
+            <option value="dueSoon">마감임박</option>
+            <option value="supplement">보완진행</option>
+            <option value="done">검토완료</option>
+            <option value="received">접수</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="regionFilter">지역</label>
+          <select id="regionFilter"><option value="all">전체</option></select>
+        </div>
+        <div class="field">
+          <label for="ownerFilter">담당자</label>
+          <select id="ownerFilter"><option value="all">전체</option></select>
+        </div>
+        <div class="field">
+          <label for="sortSelect">정렬</label>
+          <select id="sortSelect">
+            <option value="applyDesc">신청일 최신순</option>
+            <option value="applyAsc">신청일 오래된순</option>
+            <option value="dueAsc">보완마감 빠른순</option>
+            <option value="companyAsc">기업명 가나다순</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="cards" aria-label="핵심 지표">
+        <div class="metric"><span>총 기업</span><strong id="metricTotal">0</strong></div>
+        <div class="metric"><span>검토완료</span><strong id="metricDone">0</strong></div>
+        <div class="metric"><span>보완진행</span><strong id="metricSupplement">0</strong></div>
+        <div class="metric"><span>마감임박</span><strong id="metricDueSoon">0</strong></div>
+        <div class="metric"><span>마감지연</span><strong id="metricOverdue">0</strong></div>
+      </section>
+
+      <section class="content-grid">
+        <div class="table-wrap">
+          <div class="table-head">
+            <h3>기업 목록</h3>
+            <div class="source-state" id="sourceState">준비 중</div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>상태</th>
+                  <th>차수</th>
+                  <th>기업명</th>
+                  <th>신청일</th>
+                  <th>담당자</th>
+                  <th>보완요청</th>
+                  <th>보완마감</th>
+                  <th>보완완료</th>
+                  <th>지역</th>
+                  <th>대표자명</th>
+                  <th>주 업종</th>
+                  <th>연락처</th>
+                  <th>이메일</th>
+                  <th>검토완료일</th>
+                  <th>측정자</th>
+                  <th>측정자소속</th>
+                  <th>등급</th>
+                  <th>점수</th>
+                  <th>심화코칭</th>
+                </tr>
+              </thead>
+              <tbody id="companyRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <input class="hidden" id="fileInput" type="file" accept=".csv,.xls,.html,text/csv,text/html,application/vnd.ms-excel">
+  <input class="hidden" id="historyFileInput" type="file" accept=".csv,.xls,.html,text/csv,text/html,application/vnd.ms-excel" multiple>
+
+  <div class="modal" id="csvModal" role="dialog" aria-modal="true" aria-labelledby="csvTitle">
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h3 id="csvTitle">PMS 파일 추가</h3>
+        <button class="btn" id="closeCsv" type="button">닫기</button>
+      </div>
+      <div class="field">
+        <label for="csvText">PMS XLS, CSV 또는 표 복사 내용</label>
+        <textarea id="csvText" placeholder="PMS 서류검토관리 목록에서 내려받은 .xls/.csv 파일을 선택하거나 표 복사 내용을 붙여넣기"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn" id="chooseFile" type="button">파일 선택</button>
+        <button class="btn primary" id="loadCsvText" type="button">현황 반영</button>
+      </div>
+      <div class="field">
+        <label for="csvText">2024·2025 과거 서류검토 DB</label>
+        <p class="hint">과거 엑셀 파일을 추가하면 같은 기업의 최근 담당자를 현재 목록에 자동 추천합니다.</p>
+      </div>
+      <div class="actions">
+        <button class="btn" id="chooseHistoryFile" type="button">과거 DB 선택</button>
+        <button class="btn" id="loadHistoryText" type="button">붙여넣은 내용 과거 DB 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+    <div class="modal-panel stats-modal-panel">
+      <div class="modal-head">
+        <h3 id="statsTitle">통계</h3>
+        <button class="btn" id="closeStats" type="button">닫기</button>
+      </div>
+      <div class="stats-grid">
+        <div class="stats-panel">
+          <h3 class="stats-title">지역 · 차수</h3>
+          <div class="stats-scroll">
+            <table class="stats-table" id="regionRoundStats"></table>
+          </div>
+        </div>
+        <div class="stats-panel">
+          <h3 class="stats-title">차수별 접수</h3>
+          <div class="stats-scroll">
+            <table class="stats-table" id="roundStats"></table>
+          </div>
+        </div>
+        <div class="stats-panel">
+          <h3 class="stats-title">평가 결과</h3>
+          <div class="stats-scroll">
+            <table class="stats-table" id="gradeStats"></table>
+          </div>
+        </div>
+        <div class="stats-panel">
+          <h3 class="stats-title">담당자별 누적</h3>
+          <div class="stats-scroll">
+            <table class="stats-table" id="ownerStats"></table>
+          </div>
+          <div class="stats-note">담당자가 비어 있는 PMS 자료는 미지정으로 집계됩니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="history-data.js"></script>
+  <script src="current-owner-data.js"></script>
+  <script>
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1qNWCt306t_ChoGoGQyKcDeUnDvlKvvAazMyP89nM-Zw/export?format=csv&gid=1101761887";
+    const STORAGE_KEY = "svi_dongnam_companies_v1";
+    const OWNER_OVERRIDES_KEY = "svi_dongnam_owner_overrides_v1";
+    const COACHING_OVERRIDES_KEY = "svi_dongnam_coaching_overrides_v1";
+    const HISTORY_KEY = "svi_dongnam_owner_history_v1";
+    const AUTH_KEY = "svi_dongnam_auth_v1";
+    const ACCESS_PASSWORD = "1127";
+    const CURRENT_OWNERS = ["김규리", "박진국", "배현범", "엄수진", "인선영", "윤수정"];
+    const DEFAULT_OWNERS = CURRENT_OWNERS;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const sampleRows = [
+      {
+        "차수": "1",
+        "연번": "1",
+        "기업명": "산청로컬푸드사회적협동조합",
+        "신청일자": "2026-04-25",
+        "서류검토 담당자": "인선영",
+        "보완요청일": "2026-05-27",
+        "보완마감일": "2026-06-02",
+        "보완완료일": "2026-05-31",
+        "지역": "경남",
+        "대표자명": "정부환",
+        "조직유형": "예비(지역형)",
+        "서류검토완료일": "2026-06-07",
+        "측정자": "박유진",
+        "등급": ""
+      },
+      {
+        "차수": "2",
+        "연번": "1",
+        "기업명": "동남권 예시기업",
+        "신청일자": "2026-06-20",
+        "서류검토 담당자": "담당자",
+        "보완요청일": "2026-06-24",
+        "보완마감일": "2026-06-30",
+        "보완완료일": "",
+        "지역": "부산",
+        "대표자명": "",
+        "조직유형": "인증",
+        "서류검토완료일": "",
+        "측정자": "",
+        "등급": ""
+      }
+    ];
+
+    let rows = [];
+    let activeRound = "all";
+
+    const $ = (id) => document.getElementById(id);
+
+    function normalizeHeader(value) {
+      return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function detectDelimiter(text) {
+      const preview = text.split(/\r?\n/).slice(0, 8).join("\n");
+      const tabs = (preview.match(/\t/g) || []).length;
+      const commas = (preview.match(/,/g) || []).length;
+      return tabs > commas ? "\t" : ",";
+    }
+
+    function parseCsv(text) {
+      const delimiter = detectDelimiter(text);
+      const table = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let i = 0; i < text.length; i += 1) {
+        const ch = text[i];
+        const next = text[i + 1];
+        if (ch === '"' && quoted && next === '"') {
+          cell += '"';
+          i += 1;
+        } else if (ch === '"') {
+          quoted = !quoted;
+        } else if (ch === delimiter && !quoted) {
+          row.push(cell);
+          cell = "";
+        } else if ((ch === "\n" || ch === "\r") && !quoted) {
+          if (ch === "\r" && next === "\n") i += 1;
+          row.push(cell);
+          if (row.some((item) => item.trim() !== "")) table.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+      row.push(cell);
+      if (row.some((item) => item.trim() !== "")) table.push(row);
+
+      const headerIndex = table.findIndex((line) => line.map(normalizeHeader).includes("기업명"));
+      if (headerIndex < 0) return [];
+      const headers = table[headerIndex].map(normalizeHeader);
+      return table.slice(headerIndex + 1).map((line) => {
+        const record = {};
+        headers.forEach((header, index) => {
+          if (header) record[header] = normalizeHeader(line[index]);
+        });
+        return normalizeRecord(record);
+      }).filter((record) => record["기업명"]);
+    }
+
+    function parseHtmlTable(text) {
+      const doc = new DOMParser().parseFromString(text, "text/html");
+      const tables = [...doc.querySelectorAll("table")];
+      for (const table of tables) {
+        const lines = [...table.querySelectorAll("tr")].map((tr) => [...tr.children].map((cell) => normalizeHeader(cell.textContent)));
+        const headerIndex = lines.findIndex((line) => line.includes("기업명"));
+        if (headerIndex < 0) continue;
+        const headers = lines[headerIndex];
+        return lines.slice(headerIndex + 1).map((line) => {
+          const record = {};
+          headers.forEach((header, index) => {
+            if (header) record[header] = normalizeHeader(line[index]);
+          });
+          return normalizeRecord(record);
+        }).filter((record) => record["기업명"]);
+      }
+      return [];
+    }
+
+    function parseImportText(text) {
+      return /<\s*(html|table|thead|tbody|tr|td|th)\b/i.test(text) ? parseHtmlTable(text) : parseCsv(text);
+    }
+
+    function firstValue(row, keys) {
+      for (const key of keys) {
+        if (row[key]) return row[key];
+      }
+      return "";
+    }
+
+    function normalizeRound(row) {
+      const direct = firstValue(row, ["차수"]);
+      if (direct) return direct.replace(/[^0-9]/g, "") || direct;
+      const roundText = firstValue(row, ["신청년도-차수", "신청연도-차수"]);
+      const match = roundText.match(/(\d+)\s*차/);
+      return match ? match[1] : "";
+    }
+
+    function normalizeRecord(row) {
+      const normalized = { ...row };
+      const mappings = {
+        "차수": ["차수"],
+        "신청년도": ["신청년도", "신청연도", "연도", "년도"],
+        "기업명": ["기업명"],
+        "신청일자": ["신청일자", "신청일"],
+        "신청발급번호": ["신청발급번호"],
+        "서류검토 담당자": ["서류검토 담당자", "사전검토 담당자", "담당자", "검토자"],
+        "보완요청일": ["보완요청일"],
+        "보완마감일": ["보완마감일"],
+        "보완완료일": ["보완완료일"],
+        "지역": ["지역"],
+        "대표자명": ["대표자명"],
+        "주 업종": ["주 업종", "주업종", "(신청)주 업종", "(측정)주 업종", "주 업종명"],
+        "연락처": ["연락처", "전화번호", "휴대전화", "휴대폰"],
+        "이메일": ["이메일", "메일", "이메읾", "email", "E-mail"],
+        "조직유형": ["조직유형"],
+        "서류검토완료일": ["서류검토완료일", "검토완료일"],
+        "측정자소속": ["측정자소속", "측정자 소속"],
+        "측정자": ["측정자"],
+        "등급": ["등급"],
+        "점수": ["점수", "총계", "총점"],
+        "심화코칭": ["심화코칭", "심화코칭 여부", "심화코칭여부"],
+        "진행상태": ["진행상태"]
+      };
+
+      Object.entries(mappings).forEach(([target, keys]) => {
+        const found = firstValue(row, keys);
+        if (found && !normalized[target]) normalized[target] = found;
+      });
+
+      const round = normalizeRound(row);
+      if (round) normalized["차수"] = round;
+      return normalized;
+    }
+
+    function value(row, keys) {
+      for (const key of keys) {
+        if (row[key]) return row[key];
+      }
+      return "";
+    }
+
+    function asDate(value) {
+      if (!value) return null;
+      const normalized = String(value).replace(/[.]/g, "-").replace(/\s+/g, "");
+      const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (!match) return null;
+      const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+      date.setHours(0, 0, 0, 0);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function daysUntil(dateValue) {
+      const date = asDate(dateValue);
+      if (!date) return null;
+      return Math.round((date - today) / 86400000);
+    }
+
+    function statusOf(row) {
+      if (row._historyRow) return { key: "history", label: row._historyYear || "과거", className: "history" };
+      const reviewDone = value(row, ["서류검토완료일", "검토완료일"]);
+      const supplementDone = value(row, ["보완완료일"]);
+      const requestDate = value(row, ["보완요청일"]);
+      const dueDate = value(row, ["보완마감일"]);
+      const progress = value(row, ["진행상태"]);
+      const due = daysUntil(dueDate);
+      if (reviewDone || /검토완료|서류검토완료|측정완료|확인완료/.test(progress)) return { key: "done", label: progress || "검토완료", className: "done" };
+      if (!supplementDone && due !== null && due < 0) return { key: "overdue", label: progress || "마감지연", className: "danger" };
+      if (!supplementDone && due !== null && due <= 3) return { key: "dueSoon", label: progress || "마감임박", className: "warn" };
+      if ((requestDate || /보완요청|보완제출/.test(progress)) && !supplementDone) return { key: "supplement", label: progress || "보완진행", className: "review" };
+      if (supplementDone || /보완완료|보완제출/.test(progress)) return { key: "supplementDone", label: progress || "보완완료", className: "review" };
+      if (/접수|신청/.test(progress)) return { key: "received", label: progress, className: "wait" };
+      return { key: "received", label: progress || "접수", className: "wait" };
+    }
+
+    function getRound(row) {
+      return value(row, ["차수"]).replace(/[^0-9]/g, "") || "미정";
+    }
+
+    function recordKey(row) {
+      const issueNo = value(row, ["신청발급번호"]);
+      if (issueNo) return `issue:${issueNo}`;
+      return [
+        getRound(row),
+        value(row, ["기업명"]),
+        value(row, ["신청일자"])
+      ].map((item) => String(item || "").trim()).join("|");
+    }
+
+    function setSourceState(text) {
+      $("sourceState").textContent = text;
+    }
+
+    function unlockApp() {
+      document.body.classList.remove("locked");
+      document.body.classList.add("unlocked");
+    }
+
+    function initAuth() {
+      if (localStorage.getItem(AUTH_KEY) === "ok") {
+        unlockApp();
+        return;
+      }
+      $("passwordInput").focus();
+      $("authForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const password = $("passwordInput").value.trim();
+        if (password === ACCESS_PASSWORD) {
+          localStorage.setItem(AUTH_KEY, "ok");
+          $("authError").textContent = "";
+          unlockApp();
+          return;
+        }
+        $("authError").textContent = "비밀번호를 다시 확인해주세요.";
+        $("passwordInput").select();
+      });
+    }
+
+    function loadOwnerOverrides() {
+      try {
+        return JSON.parse(localStorage.getItem(OWNER_OVERRIDES_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveOwnerOverrides(overrides) {
+      localStorage.setItem(OWNER_OVERRIDES_KEY, JSON.stringify(overrides));
+    }
+
+    function loadCoachingOverrides() {
+      try {
+        return JSON.parse(localStorage.getItem(COACHING_OVERRIDES_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveCoachingOverrides(overrides) {
+      localStorage.setItem(COACHING_OVERRIDES_KEY, JSON.stringify(overrides));
+    }
+
+    function normalizeCompanyName(name) {
+      return String(name || "")
+        .toLowerCase()
+        .replace(/\(주\)|㈜|주식회사|유한회사|사회적협동조합|협동조합|사단법인|재단법인/g, "")
+        .replace(/[\s·ㆍ.,()［\]\[\]{}<>「」'"]/g, "");
+    }
+
+    function addHistoryRecord(history, record) {
+      const companyKey = record.companyKey || normalizeCompanyName(record.company);
+      if (!companyKey || !record.owner) return history;
+      const normalized = { ...record, companyKey };
+      const list = history[companyKey] || [];
+      const duplicate = list.some((item) =>
+        item.company === normalized.company &&
+        item.owner === normalized.owner &&
+        item.year === normalized.year &&
+        item.round === normalized.round &&
+        item.date === normalized.date
+      );
+      if (!duplicate) list.push(normalized);
+      history[companyKey] = list;
+      return history;
+    }
+
+    function loadHistory() {
+      const history = {};
+      (window.SVI_BUILTIN_HISTORY || []).forEach((record) => addHistoryRecord(history, record));
+      try {
+        const stored = JSON.parse(localStorage.getItem(HISTORY_KEY) || "{}");
+        Object.values(stored).flat().forEach((record) => addHistoryRecord(history, record));
+      } catch {
+        return history;
+      }
+      return history;
+    }
+
+    function saveHistory(history) {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    }
+
+    function extractYear(row, fallbackText = "") {
+      const direct = value(row, ["신청년도", "신청연도", "연도", "년도", "신청년도-차수", "신청연도-차수"]);
+      const dateText = value(row, ["신청일자", "신청일", "보완요청일", "서류검토완료일"]);
+      const match = String(direct || dateText || fallbackText || "").match(/20\d{2}/);
+      return match ? match[0] : "";
+    }
+
+    function latestHistoryFor(row, history = loadHistory()) {
+      const companyKey = normalizeCompanyName(value(row, ["기업명"]));
+      const records = history[companyKey] || [];
+      return records
+        .filter((item) => item.owner)
+        .sort((a, b) => {
+          const yearDiff = Number(b.year || 0) - Number(a.year || 0);
+          if (yearDiff) return yearDiff;
+          return String(b.date || "").localeCompare(String(a.date || ""));
+        })[0] || null;
+    }
+
+    function backupOwnerFor(row) {
+      const companyKey = normalizeCompanyName(value(row, ["기업명"]));
+      const round = getRound(row);
+      return (window.SVI_CURRENT_OWNER_BACKUP || []).find((item) =>
+        normalizeCompanyName(item.company) === companyKey &&
+        (!item.round || String(item.round).replace(/[^0-9]/g, "") === round)
+      ) || null;
+    }
+
+    function collectHistoryRecords(list, fallbackText = "") {
+      return list.map((row) => {
+        const company = value(row, ["기업명"]);
+        const owner = value(row, ["서류검토 담당자"]);
+        const companyKey = normalizeCompanyName(company);
+        if (!companyKey || !owner || /^\d{4}[-./]\d{1,2}[-./]\d{1,2}$/.test(owner)) return null;
+        return {
+          company,
+          companyKey,
+          owner,
+          year: extractYear(row, fallbackText),
+          round: getRound(row),
+          date: value(row, ["신청일자", "신청일", "서류검토완료일"])
+        };
+      }).filter(Boolean);
+    }
+
+    function mergeHistory(records) {
+      const history = loadHistory();
+      records.forEach((record) => addHistoryRecord(history, record));
+      saveHistory(history);
+      return history;
+    }
+
+    function historyRecordToRow(record) {
+      return {
+        _historyRow: true,
+        _historyYear: record.year || "",
+        "진행상태": `${record.year || "과거"} 과거자료`,
+        "차수": record.round || "",
+        "기업명": record.company || "",
+        "신청일자": record.date || "",
+        "서류검토 담당자": record.owner || "",
+        "지역": record.region || "",
+        "대표자명": record.representative || "",
+        "주 업종": record.industry || "",
+        "연락처": record.phone || "",
+        "이메일": record.email || "",
+        "측정자": record.assessor || "",
+        "측정자소속": record.assessorOrg || "",
+        "등급": record.grade || "",
+        "점수": record.score || ""
+      };
+    }
+
+    function historySearchRows(query) {
+      const normalizedQuery = String(query || "").trim().toLowerCase();
+      if (!normalizedQuery) return [];
+      return (window.SVI_BUILTIN_HISTORY || [])
+        .filter((record) => [
+          record.company,
+          record.owner,
+          record.region,
+          record.assessor
+        ].join(" ").toLowerCase().includes(normalizedQuery))
+        .map(historyRecordToRow);
+    }
+
+    function isCheckedValue(value) {
+      return /^(y|yes|true|1|대상|해당|o|○|✓|✔)$/i.test(String(value || "").trim());
+    }
+
+    function rememberCurrentOwners() {
+      const overrides = loadOwnerOverrides();
+      rows.forEach((row) => {
+        const owner = value(row, ["서류검토 담당자"]);
+        const key = recordKey(row);
+        if (key && owner && owner !== "미지정") overrides[key] = owner;
+      });
+      saveOwnerOverrides(overrides);
+    }
+
+    function rememberCurrentCoaching() {
+      const overrides = loadCoachingOverrides();
+      rows.forEach((row) => {
+        const key = recordKey(row);
+        if (key && value(row, ["심화코칭"])) overrides[key] = isCheckedValue(value(row, ["심화코칭"]));
+      });
+      saveCoachingOverrides(overrides);
+    }
+
+    function applyOwnerOverrides(list) {
+      const overrides = loadOwnerOverrides();
+      const history = loadHistory();
+      return list.map((row) => {
+        const key = recordKey(row);
+        const previous = latestHistoryFor(row, history);
+        const backup = backupOwnerFor(row);
+        const next = previous ? { ...row, _historyOwner: previous.owner, _historyYear: previous.year } : { ...row };
+        if (backup?.owner) {
+          next._historyOwner = backup.owner;
+          next._historyYear = "2026";
+        }
+        const existingOwner = value(next, ["서류검토 담당자"]);
+        const needsOwner = !existingOwner || existingOwner === "미지정";
+        if (key && overrides[key]) return { ...next, "서류검토 담당자": overrides[key] };
+        if (needsOwner && backup?.owner) return { ...next, "서류검토 담당자": backup.owner };
+        if (needsOwner && previous?.owner) return { ...next, "서류검토 담당자": previous.owner };
+        return next;
+      });
+    }
+
+    function applyCoachingOverrides(list) {
+      const overrides = loadCoachingOverrides();
+      return list.map((row) => {
+        const key = recordKey(row);
+        if (key && Object.prototype.hasOwnProperty.call(overrides, key)) return { ...row, "심화코칭": overrides[key] ? "Y" : "" };
+        return row;
+      });
+    }
+
+    function saveLocal() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+    }
+
+    function loadLocal() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function uniqueValues(keySet) {
+      return [...new Set(rows.map((row) => value(row, keySet)).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ko"));
+    }
+
+    function ownerOptions() {
+      return [...new Set([...DEFAULT_OWNERS, ...uniqueValues(["서류검토 담당자"])])].filter(Boolean).sort((a, b) => a.localeCompare(b, "ko"));
+    }
+
+    function isCurrentOwner(owner) {
+      return CURRENT_OWNERS.includes(owner);
+    }
+
+    function currentOwnerValue(row) {
+      const owner = value(row, ["서류검토 담당자"]);
+      return isCurrentOwner(owner) ? owner : "";
+    }
+
+    function fillSelect(select, values) {
+      const current = select.value;
+      select.innerHTML = '<option value="all">전체</option>' + values.map((item) => `<option>${escapeHtml(item)}</option>`).join("");
+      if ([...select.options].some((option) => option.value === current)) select.value = current;
+    }
+
+    function escapeHtml(text) {
+      return String(text || "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[ch]));
+    }
+
+    function renderRoundButtons() {
+      const counts = { all: rows.length, 1: 0, 2: 0, 3: 0 };
+      rows.forEach((row) => {
+        const round = getRound(row);
+        if (counts[round] !== undefined) counts[round] += 1;
+      });
+      const labels = [
+        ["all", "전체"],
+        ["1", "1차"],
+        ["2", "2차"],
+        ["3", "3차"]
+      ];
+      $("roundButtons").innerHTML = labels.map(([key, label]) => `
+        <button class="round-btn ${activeRound === key ? "active" : ""}" data-round="${key}" type="button">
+          <span>${label}</span><span>${counts[key] || 0}</span>
+        </button>
+      `).join("");
+      document.querySelectorAll(".round-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeRound = button.dataset.round;
+          render();
+        });
+      });
+    }
+
+    function filteredRows() {
+      const q = $("searchInput").value.trim().toLowerCase();
+      const status = $("statusFilter").value;
+      const region = $("regionFilter").value;
+      const owner = $("ownerFilter").value;
+      const sort = $("sortSelect").value;
+
+      const currentResult = rows.filter((row) => {
+        const state = statusOf(row);
+        const haystack = [
+          value(row, ["기업명"]),
+          value(row, ["지역"]),
+          value(row, ["서류검토 담당자"]),
+          value(row, ["측정자"])
+        ].join(" ").toLowerCase();
+
+        if (activeRound !== "all" && getRound(row) !== activeRound) return false;
+        if (status !== "all" && state.key !== status) return false;
+        if (region !== "all" && value(row, ["지역"]) !== region) return false;
+        if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
+        return !q || haystack.includes(q);
+      });
+
+      const historyMatches = q && status === "all" && owner === "all"
+        ? historySearchRows(q).filter((row) => region === "all" || value(row, ["지역"]) === region)
+        : [];
+      const result = [...currentResult, ...historyMatches];
+
+      result.sort((a, b) => {
+        if (sort === "companyAsc") return value(a, ["기업명"]).localeCompare(value(b, ["기업명"]), "ko");
+        if (sort === "dueAsc") return (asDate(value(a, ["보완마감일"])) || new Date(8640000000000000)) - (asDate(value(b, ["보완마감일"])) || new Date(8640000000000000));
+        const ad = asDate(value(a, ["신청일자"])) || new Date(0);
+        const bd = asDate(value(b, ["신청일자"])) || new Date(0);
+        return sort === "applyAsc" ? ad - bd : bd - ad;
+      });
+      return result;
+    }
+
+    function renderMetrics(list) {
+      const counts = { done: 0, supplement: 0, dueSoon: 0, overdue: 0 };
+      list.forEach((row) => {
+        const key = statusOf(row).key;
+        if (key === "done") counts.done += 1;
+        if (key === "supplement") counts.supplement += 1;
+        if (key === "dueSoon") counts.dueSoon += 1;
+        if (key === "overdue") counts.overdue += 1;
+      });
+      $("metricTotal").textContent = list.length;
+      $("metricDone").textContent = counts.done;
+      $("metricSupplement").textContent = counts.supplement;
+      $("metricDueSoon").textContent = counts.dueSoon;
+      $("metricOverdue").textContent = counts.overdue;
+    }
+
+    function sum(values) {
+      return values.reduce((total, item) => total + item, 0);
+    }
+
+    function countWhere(list, predicate) {
+      return list.reduce((total, row) => total + (predicate(row) ? 1 : 0), 0);
+    }
+
+    function renderRegionRoundStats(list) {
+      const baseRegions = ["대구", "경북", "부산", "울산", "경남"];
+      const extraRegions = uniqueValues(["지역"]).filter((region) => !baseRegions.includes(region));
+      const regions = [...baseRegions, ...extraRegions];
+      const rounds = ["1", "2", "3"];
+      const header = `<tr><th></th>${regions.map((region) => `<th>${escapeHtml(region)}</th>`).join("")}<th>계</th></tr>`;
+      const body = rounds.map((round) => {
+        const counts = regions.map((region) => countWhere(list, (row) => getRound(row) === round && value(row, ["지역"]) === region));
+        return `<tr><th class="row-head">${round}차</th>${counts.map((count) => `<td>${count}</td>`).join("")}<td>${sum(counts)}</td></tr>`;
+      }).join("");
+      const totals = regions.map((region) => countWhere(list, (row) => value(row, ["지역"]) === region));
+      $("regionRoundStats").innerHTML = `${header}${body}<tr class="total-row"><th class="total-head">계</th>${totals.map((count) => `<td>${count}</td>`).join("")}<td>${sum(totals)}</td></tr>`;
+    }
+
+    function renderRoundStats(list) {
+      const rounds = ["1", "2", "3"];
+      const counts = rounds.map((round) => countWhere(list, (row) => getRound(row) === round));
+      $("roundStats").innerHTML = `
+        <tr>${rounds.map((round) => `<th>${round}차</th>`).join("")}<th>계</th></tr>
+        <tr>${counts.map((count) => `<td>${count}</td>`).join("")}<td>${sum(counts)}</td></tr>
+      `;
+    }
+
+    function normalizeGrade(row) {
+      const grade = value(row, ["등급"]).replace(/\s+/g, "");
+      if (/탁월/.test(grade)) return "탁월";
+      if (/우수/.test(grade)) return "우수";
+      if (/양호/.test(grade)) return "양호";
+      if (/미흡/.test(grade)) return "미흡";
+      if (/취약/.test(grade)) return "취약";
+      return "";
+    }
+
+    function renderGradeStats(list) {
+      const rounds = ["1", "2", "3"];
+      const grades = ["탁월", "우수", "양호", "미흡", "취약"];
+      const header = `<tr><th></th>${grades.map((grade) => `<th>${grade}</th>`).join("")}<th>계</th></tr>`;
+      const body = rounds.map((round) => {
+        const counts = grades.map((grade) => countWhere(list, (row) => getRound(row) === round && normalizeGrade(row) === grade));
+        return `<tr><th class="row-head">${round}차</th>${counts.map((count) => `<td>${count}</td>`).join("")}<td>${sum(counts)}</td></tr>`;
+      }).join("");
+      const totals = grades.map((grade) => countWhere(list, (row) => normalizeGrade(row) === grade));
+      $("gradeStats").innerHTML = `${header}${body}<tr class="total-row"><th class="total-head">계</th>${totals.map((count) => `<td>${count}</td>`).join("")}<td>${sum(totals)}</td></tr>`;
+    }
+
+    function renderOwnerStats(list) {
+      const owners = CURRENT_OWNERS;
+      if (!list.length) {
+        $("ownerStats").innerHTML = '<tr><td class="empty">표시할 담당자 통계가 없습니다.</td></tr>';
+        return;
+      }
+      const counts = owners.map((owner) => countWhere(list, (row) => currentOwnerValue(row) === owner));
+      const unknown = countWhere(list, (row) => !currentOwnerValue(row));
+      const unknownCell = unknown ? `<th>미지정</th>` : "";
+      const unknownValue = unknown ? `<td>${unknown}</td>` : "";
+      $("ownerStats").innerHTML = `
+        <tr>${owners.map((owner) => `<th>${escapeHtml(owner)}</th>`).join("")}${unknownCell}<th>계</th></tr>
+        <tr>${counts.map((count) => `<td>${count}</td>`).join("")}${unknownValue}<td>${sum(counts) + unknown}</td></tr>
+      `;
+    }
+
+    function renderStats(list) {
+      renderRegionRoundStats(list);
+      renderRoundStats(list);
+      renderGradeStats(list);
+      renderOwnerStats(list);
+    }
+
+    function renderTable(list) {
+      const body = $("companyRows");
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="19" class="empty">표시할 기업이 없습니다.</td></tr>';
+        return;
+      }
+      const owners = ownerOptions();
+      body.innerHTML = list.map((row) => {
+        const state = statusOf(row);
+        const selectedOwner = currentOwnerValue(row);
+        const ownerChoices = [...new Set([...owners, selectedOwner].filter(Boolean))];
+        const key = recordKey(row);
+        const ownerSelect = `
+          <select class="owner-select" data-owner-key="${escapeHtml(key)}" aria-label="담당자 선택">
+            <option value="">미지정</option>
+            ${ownerChoices.map((owner) => `<option value="${escapeHtml(owner)}" ${owner === selectedOwner ? "selected" : ""}>${escapeHtml(owner)}</option>`).join("")}
+          </select>
+        `;
+        const ownerCell = row._historyRow
+          ? `<span class="history-owner-text">${escapeHtml(value(row, ["서류검토 담당자"]) || "-")}</span>`
+          : `<div class="owner-cell">${ownerSelect}</div>`;
+        const coachingCheck = `<input class="coaching-check" type="checkbox" data-coaching-key="${escapeHtml(key)}" aria-label="심화코칭 해당" ${isCheckedValue(value(row, ["심화코칭"])) ? "checked" : ""}>`;
+        return `
+          <tr class="${row._historyRow ? "history-row" : "current-row"}">
+            <td><span class="pill ${state.className}">${state.label}</span></td>
+            <td>${escapeHtml(getRound(row))}</td>
+            <td class="company">${escapeHtml(value(row, ["기업명"]))}</td>
+            <td>${escapeHtml(value(row, ["신청일자"]))}</td>
+            <td>${ownerCell}</td>
+            <td>${escapeHtml(value(row, ["보완요청일"]))}</td>
+            <td>${escapeHtml(value(row, ["보완마감일"]))}</td>
+            <td>${escapeHtml(value(row, ["보완완료일"]))}</td>
+            <td>${escapeHtml(value(row, ["지역"]))}</td>
+            <td>${escapeHtml(value(row, ["대표자명"]))}</td>
+            <td>${escapeHtml(value(row, ["주 업종"]))}</td>
+            <td>${escapeHtml(value(row, ["연락처"]))}</td>
+            <td>${escapeHtml(value(row, ["이메일"]))}</td>
+            <td>${escapeHtml(value(row, ["서류검토완료일", "검토완료일"]))}</td>
+            <td>${escapeHtml(value(row, ["측정자"]))}</td>
+            <td>${escapeHtml(value(row, ["측정자소속"]))}</td>
+            <td>${escapeHtml(value(row, ["등급"]))}</td>
+            <td>${escapeHtml(value(row, ["점수"]))}</td>
+            <td>${row._historyRow ? "-" : coachingCheck}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderSubtitle() {
+      const label = activeRound === "all" ? "전체 차수" : `${activeRound}차`;
+      const doneOne = rows.filter((row) => getRound(row) === "1").every((row) => statusOf(row).key === "done");
+      $("subtitle").textContent = `${label} 기준 · 1차 ${doneOne && rows.some((row) => getRound(row) === "1") ? "검토 완료" : "진행 현황 포함"}`;
+    }
+
+    function render() {
+      renderRoundButtons();
+      fillSelect($("regionFilter"), uniqueValues(["지역"]));
+      fillSelect($("ownerFilter"), CURRENT_OWNERS);
+      const list = filteredRows();
+      const currentList = list.filter((row) => !row._historyRow);
+      renderMetrics(currentList);
+      renderStats(currentList);
+      renderTable(list);
+      renderSubtitle();
+    }
+
+    function setOwnerOverride(key, owner) {
+      const overrides = loadOwnerOverrides();
+      if (owner) overrides[key] = owner;
+      else delete overrides[key];
+      saveOwnerOverrides(overrides);
+      rows = rows.map((row) => recordKey(row) === key ? { ...row, "서류검토 담당자": owner } : row);
+      saveLocal();
+      render();
+    }
+
+    function setCoachingOverride(key, checked) {
+      const overrides = loadCoachingOverrides();
+      overrides[key] = Boolean(checked);
+      saveCoachingOverrides(overrides);
+      rows = rows.map((row) => recordKey(row) === key ? { ...row, "심화코칭": checked ? "Y" : "" } : row);
+      saveLocal();
+      render();
+    }
+
+    async function loadSheet() {
+      setSourceState("시트 연결 중");
+      try {
+        const response = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error("sheet");
+        const text = await response.text();
+        const parsed = parseImportText(text);
+        if (!parsed.length) throw new Error("empty");
+        rememberCurrentOwners();
+        rememberCurrentCoaching();
+        rows = applyCoachingOverrides(applyOwnerOverrides(parsed));
+        saveLocal();
+        setSourceState(`구글시트 동기화 · ${rows.length}건`);
+        render();
+      } catch {
+        const local = loadLocal();
+        rows = applyCoachingOverrides(applyOwnerOverrides(local.length ? local : sampleRows));
+        setSourceState(local.length ? `브라우저 저장 데이터 · ${rows.length}건` : "예시 데이터 표시 중");
+        render();
+      }
+    }
+
+    function loadInitialData() {
+      const local = loadLocal();
+      if (local.length) {
+        rows = applyCoachingOverrides(applyOwnerOverrides(local));
+        setSourceState(`브라우저 저장 데이터 · ${rows.length}건`);
+        render();
+        return;
+      }
+      loadSheet();
+    }
+
+    function loadCsvText(text) {
+      const parsed = parseImportText(text);
+      if (!parsed.length) {
+        setSourceState("CSV에서 기업명을 찾지 못했습니다");
+        return;
+      }
+      rememberCurrentOwners();
+      rememberCurrentCoaching();
+      rows = applyCoachingOverrides(applyOwnerOverrides(parsed));
+      saveLocal();
+      $("csvModal").classList.remove("open");
+      setSourceState(`PMS 파일 추가 · ${rows.length}건`);
+      render();
+    }
+
+    function loadHistoryText(text, sourceName = "") {
+      const parsed = parseImportText(text);
+      const records = collectHistoryRecords(parsed, sourceName);
+      if (!records.length) {
+        setSourceState("과거 DB에서 기업명과 담당자를 찾지 못했습니다");
+        return;
+      }
+      const history = mergeHistory(records);
+      rows = applyCoachingOverrides(applyOwnerOverrides(rows));
+      saveLocal();
+      $("csvModal").classList.remove("open");
+      const total = Object.values(history).reduce((count, list) => count + list.length, 0);
+      setSourceState(`과거 DB 저장 · 이번 ${records.length}건 / 누적 ${total}건`);
+      render();
+    }
+
+    async function loadHistoryFiles(files) {
+      let added = 0;
+      for (const file of files) {
+        const parsed = parseImportText(await file.text());
+        const records = collectHistoryRecords(parsed, file.name);
+        if (records.length) {
+          mergeHistory(records);
+          added += records.length;
+        }
+      }
+      if (!added) {
+        setSourceState("과거 DB에서 기업명과 담당자를 찾지 못했습니다");
+        return;
+      }
+      rows = applyCoachingOverrides(applyOwnerOverrides(rows));
+      saveLocal();
+      $("csvModal").classList.remove("open");
+      const total = Object.values(loadHistory()).reduce((count, list) => count + list.length, 0);
+      setSourceState(`과거 DB 저장 · 이번 ${added}건 / 누적 ${total}건`);
+      render();
+    }
+
+    ["searchInput", "statusFilter", "regionFilter", "ownerFilter", "sortSelect"].forEach((id) => {
+      $(id).addEventListener("input", render);
+      $(id).addEventListener("change", render);
+    });
+
+    $("csvBtn").addEventListener("click", () => $("csvModal").classList.add("open"));
+    $("closeCsv").addEventListener("click", () => $("csvModal").classList.remove("open"));
+    $("statsBtn").addEventListener("click", () => $("statsModal").classList.add("open"));
+    $("closeStats").addEventListener("click", () => $("statsModal").classList.remove("open"));
+    $("statsModal").addEventListener("click", (event) => {
+      if (!event.target.closest(".modal-panel")) $("statsModal").classList.remove("open");
+    });
+    $("chooseFile").addEventListener("click", () => $("fileInput").click());
+    $("chooseHistoryFile").addEventListener("click", () => $("historyFileInput").click());
+    $("loadCsvText").addEventListener("click", () => loadCsvText($("csvText").value));
+    $("loadHistoryText").addEventListener("click", () => loadHistoryText($("csvText").value, "붙여넣기"));
+    $("companyRows").addEventListener("change", (event) => {
+      if (event.target.classList.contains("owner-select")) {
+        setOwnerOverride(event.target.dataset.ownerKey, event.target.value);
+        return;
+      }
+      if (event.target.classList.contains("coaching-check")) {
+        setCoachingOverride(event.target.dataset.coachingKey, event.target.checked);
+      }
+    });
+    $("fileInput").addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      loadCsvText(await file.text());
+      event.target.value = "";
+    });
+    $("historyFileInput").addEventListener("change", async (event) => {
+      const files = [...event.target.files];
+      if (!files.length) return;
+      await loadHistoryFiles(files);
+      event.target.value = "";
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        $("csvModal").classList.remove("open");
+        $("statsModal").classList.remove("open");
+      }
+    });
+
+    initAuth();
+    loadInitialData();
+  </script>
+</body>
+</html>
