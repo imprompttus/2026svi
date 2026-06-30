@@ -475,7 +475,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1680px;
+      min-width: 1980px;
       font-size: 13px;
     }
 
@@ -501,19 +501,19 @@
     }
 
     .company {
-      font-weight: 800;
+      font-weight: 600;
       color: #16221c;
-      max-width: 250px;
+      max-width: 190px;
     }
 
     .owner-select {
-      width: 138px;
-      min-width: 118px;
+      width: 92px;
+      min-width: 86px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #fff;
       color: var(--ink);
-      padding: 7px 8px;
+      padding: 7px 6px;
       height: 34px;
       font-size: 12px;
     }
@@ -521,7 +521,7 @@
     .owner-cell {
       display: grid;
       gap: 4px;
-      min-width: 150px;
+      min-width: 92px;
     }
 
     .history-row {
@@ -536,12 +536,6 @@
 
     .current-row td {
       background: #fff;
-    }
-
-    .current-row .company,
-    .current-row td:nth-child(4) {
-      color: #001f18;
-      font-weight: 900;
     }
 
     .current-row td:first-child {
@@ -577,6 +571,51 @@
     .pill.history { background: #eef3ee; color: #53605a; font-weight: 800; }
     .pill.warn { background: var(--amber-soft); color: var(--amber); }
     .pill.danger { background: var(--red-soft); color: var(--red); }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 74px;
+      min-width: 74px;
+      max-width: 74px;
+      padding-left: 10px;
+      padding-right: 8px;
+      white-space: nowrap;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+      width: 190px;
+      min-width: 190px;
+      max-width: 190px;
+    }
+
+    th:nth-child(4),
+    td:nth-child(4),
+    th:nth-child(6),
+    td:nth-child(6),
+    th:nth-child(7),
+    td:nth-child(7),
+    th:nth-child(8),
+    td:nth-child(8),
+    th:nth-child(9),
+    td:nth-child(9),
+    th:nth-child(12),
+    td:nth-child(12),
+    th:nth-child(14),
+    td:nth-child(14),
+    th:nth-child(15),
+    td:nth-child(15),
+    th:nth-child(16),
+    td:nth-child(16) {
+      white-space: nowrap;
+    }
+
+    th:nth-child(5),
+    td:nth-child(5) {
+      width: 108px;
+      min-width: 108px;
+      max-width: 108px;
+    }
 
     .empty {
       padding: 32px 14px;
@@ -784,9 +823,9 @@
                   <th>기업명</th>
                   <th>신청일</th>
                   <th>담당자</th>
-                  <th>보완요청</th>
-                  <th>보완마감</th>
-                  <th>보완완료</th>
+                  <th>보완요청일</th>
+                  <th>보완마감일</th>
+                  <th>보완완료일</th>
                   <th>지역</th>
                   <th>대표자명</th>
                   <th>주 업종</th>
