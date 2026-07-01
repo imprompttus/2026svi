@@ -335,6 +335,19 @@
       display: grid;
       gap: 6px;
       align-content: start;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .metric:hover {
+      border-color: #b7d6c4;
+      background: #f3faf6;
+    }
+
+    .metric.active {
+      border-color: var(--green);
+      box-shadow: inset 4px 0 0 var(--green);
+      background: #f4fbf7;
     }
 
     .metric span {
@@ -390,6 +403,7 @@
       width: 100%;
       min-width: 0;
       border-collapse: collapse;
+      table-layout: fixed;
       font-size: 13px;
     }
 
@@ -400,6 +414,8 @@
       text-align: center;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .stats-table th {
@@ -473,21 +489,22 @@
       min-height: 520px;
     }
 
-    table {
+    .table-wrap table {
       width: 100%;
       border-collapse: collapse;
       min-width: 1860px;
       font-size: 13px;
     }
 
-    th, td {
+    .table-wrap th,
+    .table-wrap td {
       padding: 10px 12px;
       border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: middle;
     }
 
-    th {
+    .table-wrap th {
       position: sticky;
       top: 0;
       z-index: 1;
@@ -497,7 +514,7 @@
       white-space: nowrap;
     }
 
-    tbody tr:hover td {
+    .table-wrap tbody tr:hover td {
       background: #e4f3ea;
     }
 
@@ -539,6 +556,15 @@
       color: var(--green);
       text-decoration: underline;
       text-underline-offset: 3px;
+    }
+
+    .owner-display.suggested {
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .owner-display.suggested::after {
+      color: #3b82f6;
     }
 
     .owner-select {
@@ -618,8 +644,8 @@
     .pill.warn { background: var(--amber-soft); color: var(--amber); }
     .pill.danger { background: var(--red-soft); color: var(--red); }
 
-    th:nth-child(1),
-    td:nth-child(1) {
+    .table-wrap th:nth-child(1),
+    .table-wrap td:nth-child(1) {
       width: 74px;
       min-width: 74px;
       max-width: 74px;
@@ -628,47 +654,47 @@
       white-space: nowrap;
     }
 
-    th:nth-child(3),
-    td:nth-child(3) {
+    .table-wrap th:nth-child(3),
+    .table-wrap td:nth-child(3) {
       width: 190px;
       min-width: 190px;
       max-width: 190px;
     }
 
-    th:nth-child(4),
-    td:nth-child(4),
-    th:nth-child(6),
-    td:nth-child(6),
-    th:nth-child(7),
-    td:nth-child(7),
-    th:nth-child(8),
-    td:nth-child(8),
-    th:nth-child(9),
-    td:nth-child(9),
-    th:nth-child(12),
-    td:nth-child(12),
-    th:nth-child(14),
-    td:nth-child(14),
-    th:nth-child(15),
-    td:nth-child(15),
-    th:nth-child(16),
-    td:nth-child(16) {
+    .table-wrap th:nth-child(4),
+    .table-wrap td:nth-child(4),
+    .table-wrap th:nth-child(6),
+    .table-wrap td:nth-child(6),
+    .table-wrap th:nth-child(7),
+    .table-wrap td:nth-child(7),
+    .table-wrap th:nth-child(8),
+    .table-wrap td:nth-child(8),
+    .table-wrap th:nth-child(9),
+    .table-wrap td:nth-child(9),
+    .table-wrap th:nth-child(12),
+    .table-wrap td:nth-child(12),
+    .table-wrap th:nth-child(14),
+    .table-wrap td:nth-child(14),
+    .table-wrap th:nth-child(15),
+    .table-wrap td:nth-child(15),
+    .table-wrap th:nth-child(16),
+    .table-wrap td:nth-child(16) {
       white-space: nowrap;
     }
 
-    th:nth-child(5),
-    td:nth-child(5) {
+    .table-wrap th:nth-child(5),
+    .table-wrap td:nth-child(5) {
       width: 88px;
       min-width: 88px;
       max-width: 88px;
     }
 
-    th:nth-child(6),
-    td:nth-child(6),
-    th:nth-child(7),
-    td:nth-child(7),
-    th:nth-child(8),
-    td:nth-child(8) {
+    .table-wrap th:nth-child(6),
+    .table-wrap td:nth-child(6),
+    .table-wrap th:nth-child(7),
+    .table-wrap td:nth-child(7),
+    .table-wrap th:nth-child(8),
+    .table-wrap td:nth-child(8) {
       width: 100px;
       min-width: 100px;
       max-width: 100px;
@@ -676,8 +702,8 @@
       padding-right: 8px;
     }
 
-    th:nth-child(11),
-    td:nth-child(11) {
+    .table-wrap th:nth-child(11),
+    .table-wrap td:nth-child(11) {
       width: 170px;
       min-width: 170px;
       max-width: 170px;
@@ -685,8 +711,8 @@
       line-height: 1.25;
     }
 
-    th:nth-child(13),
-    td:nth-child(13) {
+    .table-wrap th:nth-child(13),
+    .table-wrap td:nth-child(13) {
       width: 180px;
       min-width: 180px;
       max-width: 180px;
@@ -851,8 +877,9 @@
           <select id="statusFilter">
             <option value="all">전체</option>
             <option value="overdue">마감지연</option>
-            <option value="dueSoon">마감임박</option>
+            <option value="dueSoon">보완임박</option>
             <option value="supplement">보완진행</option>
+            <option value="supplementDone">보완완료</option>
             <option value="done">검토완료</option>
             <option value="received">접수</option>
           </select>
@@ -877,11 +904,11 @@
       </section>
 
       <section class="cards" aria-label="핵심 지표">
-        <div class="metric"><span>총 기업</span><strong id="metricTotal">0</strong></div>
-        <div class="metric"><span>검토완료</span><strong id="metricDone">0</strong></div>
-        <div class="metric"><span>보완진행</span><strong id="metricSupplement">0</strong></div>
-        <div class="metric"><span>마감임박</span><strong id="metricDueSoon">0</strong></div>
-        <div class="metric"><span>마감지연</span><strong id="metricOverdue">0</strong></div>
+        <button class="metric" data-metric-status="all" type="button"><span>총 기업</span><strong id="metricTotal">0</strong></button>
+        <button class="metric" data-metric-status="done" type="button"><span>검토완료</span><strong id="metricDone">0</strong></button>
+        <button class="metric" data-metric-status="supplement" type="button"><span>보완진행</span><strong id="metricSupplement">0</strong></button>
+        <button class="metric" data-metric-status="dueSoon" type="button"><span>보완임박</span><strong id="metricDueSoon">0</strong></button>
+        <button class="metric" data-metric-status="supplementDone" type="button"><span>보완완료</span><strong id="metricSupplementDone">0</strong></button>
       </section>
 
       <section class="content-grid">
@@ -993,6 +1020,7 @@
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1qNWCt306t_ChoGoGQyKcDeUnDvlKvvAazMyP89nM-Zw/export?format=csv&gid=1101761887";
     const STORAGE_KEY = "svi_dongnam_companies_v1";
     const OWNER_OVERRIDES_KEY = "svi_dongnam_owner_overrides_v1";
+    const OWNER_CONFIRMED_KEY = "svi_dongnam_owner_confirmed_v1";
     const COACHING_OVERRIDES_KEY = "svi_dongnam_coaching_overrides_v1";
     const HISTORY_KEY = "svi_dongnam_owner_history_v1";
     const AUTH_KEY = "svi_dongnam_auth_v1";
@@ -1039,7 +1067,7 @@
     ];
 
     let rows = [];
-    let activeRound = "all";
+    let activeRound = "2";
 
     const $ = (id) => document.getElementById(id);
 
@@ -1348,11 +1376,11 @@
       const dueDate = value(row, ["보완마감일"]);
       const progress = value(row, ["진행상태"]);
       const due = daysUntil(dueDate);
-      if (reviewDone || /검토완료|서류검토완료|측정완료|확인완료/.test(progress)) return { key: "done", label: progress || "검토완료", className: "done" };
+      if (reviewDone || /서류검토완료/.test(progress)) return { key: "done", label: progress || "검토완료", className: "done" };
+      if (supplementDone || /보완완료/.test(progress)) return { key: "supplementDone", label: progress || "보완완료", className: "review" };
       if (!supplementDone && due !== null && due < 0) return { key: "overdue", label: progress || "마감지연", className: "danger" };
-      if (!supplementDone && due !== null && due <= 3) return { key: "dueSoon", label: progress || "마감임박", className: "warn" };
-      if ((requestDate || /보완요청|보완제출/.test(progress)) && !supplementDone) return { key: "supplement", label: progress || "보완진행", className: "review" };
-      if (supplementDone || /보완완료|보완제출/.test(progress)) return { key: "supplementDone", label: progress || "보완완료", className: "review" };
+      if ((requestDate || /보완요청/.test(progress)) && due !== null && due <= 1 && due >= 0) return { key: "dueSoon", label: progress || "보완임박", className: "warn" };
+      if ((requestDate || /보완요청/.test(progress)) && !supplementDone) return { key: "supplement", label: progress || "보완진행", className: "review" };
       if (/접수|신청/.test(progress)) return { key: "received", label: progress, className: "wait" };
       return { key: "received", label: progress || "접수", className: "wait" };
     }
@@ -1410,6 +1438,18 @@
 
     function saveOwnerOverrides(overrides) {
       localStorage.setItem(OWNER_OVERRIDES_KEY, JSON.stringify(overrides));
+    }
+
+    function loadOwnerConfirmed() {
+      try {
+        return JSON.parse(localStorage.getItem(OWNER_CONFIRMED_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveOwnerConfirmed(confirmed) {
+      localStorage.setItem(OWNER_CONFIRMED_KEY, JSON.stringify(confirmed));
     }
 
     function loadCoachingOverrides() {
@@ -1557,6 +1597,7 @@
     function rememberCurrentOwners() {
       const overrides = loadOwnerOverrides();
       rows.forEach((row) => {
+        if (row._ownerSuggested) return;
         const owner = value(row, ["서류검토 담당자"]);
         const key = recordKey(row);
         if (key && owner && owner !== "미지정") overrides[key] = owner;
@@ -1575,6 +1616,7 @@
 
     function applyOwnerOverrides(list) {
       const overrides = loadOwnerOverrides();
+      const confirmed = loadOwnerConfirmed();
       const history = loadHistory();
       return list.map((row) => {
         const key = recordKey(row);
@@ -1587,10 +1629,23 @@
         }
         const existingOwner = value(next, ["서류검토 담당자"]);
         const needsOwner = !existingOwner || existingOwner === "미지정";
-        if (key && overrides[key]) return { ...next, "서류검토 담당자": overrides[key] };
-        if (needsOwner && backup?.owner) return { ...next, "서류검토 담당자": backup.owner };
-        if (needsOwner && previous?.owner) return { ...next, "서류검토 담당자": previous.owner };
-        return next;
+        if (key && overrides[key]) {
+          const isUnconfirmedHistoryMatch = !confirmed[key] && !backup?.owner && previous?.owner && overrides[key] === previous.owner;
+          return {
+            ...next,
+            "서류검토 담당자": overrides[key],
+            _ownerSuggested: isUnconfirmedHistoryMatch,
+            _ownerSuggestedYear: isUnconfirmedHistoryMatch ? previous.year : ""
+          };
+        }
+        if (needsOwner && backup?.owner) return { ...next, "서류검토 담당자": backup.owner, _ownerSuggested: false };
+        if (needsOwner && previous?.owner) {
+          return { ...next, "서류검토 담당자": previous.owner, _ownerSuggested: true, _ownerSuggestedYear: previous.year };
+        }
+        if (!backup?.owner && previous?.owner && existingOwner === previous.owner) {
+          return { ...next, _ownerSuggested: true, _ownerSuggestedYear: previous.year };
+        }
+        return { ...next, _ownerSuggested: false };
       });
     }
 
@@ -1646,6 +1701,14 @@
         '"': "&quot;",
         "'": "&#39;"
       }[ch]));
+    }
+
+    function formatScore(valueText) {
+      const text = String(valueText || "").trim();
+      if (!text) return "";
+      const number = Number(text.replace(/,/g, ""));
+      if (!Number.isFinite(number)) return text;
+      return String(Math.round(number * 10) / 10);
     }
 
     function renderRoundButtons() {
@@ -1711,20 +1774,42 @@
       return result;
     }
 
+    function metricBaseRows() {
+      const q = $("searchInput").value.trim().toLowerCase();
+      const region = $("regionFilter").value;
+      const owner = $("ownerFilter").value;
+      return rows.filter((row) => {
+        const haystack = [
+          value(row, ["기업명"]),
+          value(row, ["지역"]),
+          value(row, ["서류검토 담당자"]),
+          value(row, ["측정자"])
+        ].join(" ").toLowerCase();
+
+        if (activeRound !== "all" && getRound(row) !== activeRound) return false;
+        if (region !== "all" && value(row, ["지역"]) !== region) return false;
+        if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
+        return !q || haystack.includes(q);
+      });
+    }
+
     function renderMetrics(list) {
-      const counts = { done: 0, supplement: 0, dueSoon: 0, overdue: 0 };
+      const counts = { done: 0, supplement: 0, dueSoon: 0, supplementDone: 0 };
       list.forEach((row) => {
         const key = statusOf(row).key;
         if (key === "done") counts.done += 1;
         if (key === "supplement") counts.supplement += 1;
         if (key === "dueSoon") counts.dueSoon += 1;
-        if (key === "overdue") counts.overdue += 1;
+        if (key === "supplementDone") counts.supplementDone += 1;
       });
       $("metricTotal").textContent = list.length;
       $("metricDone").textContent = counts.done;
       $("metricSupplement").textContent = counts.supplement;
       $("metricDueSoon").textContent = counts.dueSoon;
-      $("metricOverdue").textContent = counts.overdue;
+      $("metricSupplementDone").textContent = counts.supplementDone;
+      document.querySelectorAll(".metric[data-metric-status]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.metricStatus === $("statusFilter").value);
+      });
     }
 
     function sum(values) {
@@ -1733,6 +1818,10 @@
 
     function countWhere(list, predicate) {
       return list.reduce((total, row) => total + (predicate(row) ? 1 : 0), 0);
+    }
+
+    function equalCols(count) {
+      return `<colgroup>${Array.from({ length: count }, () => "<col>").join("")}</colgroup>`;
     }
 
     function renderRegionRoundStats(list) {
@@ -1746,13 +1835,14 @@
         return `<tr><th class="row-head">${round}차</th>${counts.map((count) => `<td>${count}</td>`).join("")}<td>${sum(counts)}</td></tr>`;
       }).join("");
       const totals = regions.map((region) => countWhere(list, (row) => value(row, ["지역"]) === region));
-      $("regionRoundStats").innerHTML = `${header}${body}<tr class="total-row"><th class="total-head">계</th>${totals.map((count) => `<td>${count}</td>`).join("")}<td>${sum(totals)}</td></tr>`;
+      $("regionRoundStats").innerHTML = `${equalCols(regions.length + 2)}${header}${body}<tr class="total-row"><th class="total-head">계</th>${totals.map((count) => `<td>${count}</td>`).join("")}<td>${sum(totals)}</td></tr>`;
     }
 
     function renderRoundStats(list) {
       const rounds = ["1", "2", "3"];
       const counts = rounds.map((round) => countWhere(list, (row) => getRound(row) === round));
       $("roundStats").innerHTML = `
+        ${equalCols(rounds.length + 1)}
         <tr>${rounds.map((round) => `<th>${round}차</th>`).join("")}<th>계</th></tr>
         <tr>${counts.map((count) => `<td>${count}</td>`).join("")}<td>${sum(counts)}</td></tr>
       `;
@@ -1777,7 +1867,7 @@
         return `<tr><th class="row-head">${round}차</th>${counts.map((count) => `<td>${count}</td>`).join("")}<td>${sum(counts)}</td></tr>`;
       }).join("");
       const totals = grades.map((grade) => countWhere(list, (row) => normalizeGrade(row) === grade));
-      $("gradeStats").innerHTML = `${header}${body}<tr class="total-row"><th class="total-head">계</th>${totals.map((count) => `<td>${count}</td>`).join("")}<td>${sum(totals)}</td></tr>`;
+      $("gradeStats").innerHTML = `${equalCols(grades.length + 2)}${header}${body}<tr class="total-row"><th class="total-head">계</th>${totals.map((count) => `<td>${count}</td>`).join("")}<td>${sum(totals)}</td></tr>`;
     }
 
     function renderOwnerStats(list) {
@@ -1791,6 +1881,7 @@
       const unknownCell = unknown ? `<th>미지정</th>` : "";
       const unknownValue = unknown ? `<td>${unknown}</td>` : "";
       $("ownerStats").innerHTML = `
+        ${equalCols(owners.length + (unknown ? 2 : 1))}
         <tr>${owners.map((owner) => `<th>${escapeHtml(owner)}</th>`).join("")}${unknownCell}<th>계</th></tr>
         <tr>${counts.map((count) => `<td>${count}</td>`).join("")}${unknownValue}<td>${sum(counts) + unknown}</td></tr>
       `;
@@ -1815,6 +1906,10 @@
         const selectedOwner = currentOwnerValue(row);
         const ownerChoices = owners;
         const key = recordKey(row);
+        const suggestedClass = row._ownerSuggested ? " suggested" : "";
+        const suggestedTitle = row._ownerSuggested
+          ? `과거 ${escapeHtml(row._ownerSuggestedYear || row._historyYear || "")} 담당자 기준 자동 추천`
+          : "담당자 선택";
         const ownerSelect = `
           <select class="owner-select hidden" data-owner-key="${escapeHtml(key)}" aria-label="담당자 선택">
             <option value="">미지정</option>
@@ -1824,7 +1919,7 @@
         const ownerCell = row._historyRow
           ? `<span class="history-owner-text">${escapeHtml(value(row, ["서류검토 담당자"]) || "-")}</span>`
           : `<div class="owner-cell">
-              <button class="owner-display" data-owner-open="${escapeHtml(key)}" type="button">${escapeHtml(selectedOwner || "미지정")}</button>
+              <button class="owner-display${suggestedClass}" data-owner-open="${escapeHtml(key)}" type="button" title="${suggestedTitle}">${escapeHtml(selectedOwner || "미지정")}</button>
               ${ownerSelect}
             </div>`;
         const coachingCheck = `<input class="coaching-check" type="checkbox" data-coaching-key="${escapeHtml(key)}" aria-label="심화코칭 해당" ${isCheckedValue(value(row, ["심화코칭"])) ? "checked" : ""}>`;
@@ -1847,7 +1942,7 @@
             <td>${escapeHtml(value(row, ["측정자"]))}</td>
             <td>${escapeHtml(value(row, ["측정자소속"]))}</td>
             <td>${escapeHtml(value(row, ["등급"]))}</td>
-            <td>${escapeHtml(value(row, ["점수"]))}</td>
+            <td>${escapeHtml(formatScore(value(row, ["점수"])))}</td>
             <td>${row._historyRow ? "-" : coachingCheck}</td>
           </tr>
         `;
@@ -1866,7 +1961,7 @@
       fillSelect($("ownerFilter"), CURRENT_OWNERS);
       const list = filteredRows();
       const currentList = list.filter((row) => !row._historyRow);
-      renderMetrics(currentList);
+      renderMetrics(metricBaseRows());
       renderStats(currentList);
       renderTable(list);
       renderSubtitle();
@@ -1874,10 +1969,14 @@
 
     function setOwnerOverride(key, owner) {
       const overrides = loadOwnerOverrides();
+      const confirmed = loadOwnerConfirmed();
       if (owner) overrides[key] = owner;
       else delete overrides[key];
+      if (owner) confirmed[key] = true;
+      else delete confirmed[key];
       saveOwnerOverrides(overrides);
-      rows = rows.map((row) => recordKey(row) === key ? { ...row, "서류검토 담당자": owner } : row);
+      saveOwnerConfirmed(confirmed);
+      rows = rows.map((row) => recordKey(row) === key ? { ...row, "서류검토 담당자": owner, _ownerSuggested: false } : row);
       saveLocal();
       render();
     }
@@ -1994,6 +2093,12 @@
     ["searchInput", "statusFilter", "regionFilter", "ownerFilter", "sortSelect"].forEach((id) => {
       $(id).addEventListener("input", render);
       $(id).addEventListener("change", render);
+    });
+    document.querySelectorAll(".metric[data-metric-status]").forEach((button) => {
+      button.addEventListener("click", () => {
+        $("statusFilter").value = button.dataset.metricStatus;
+        render();
+      });
     });
 
     $("csvBtn").addEventListener("click", openImportModal);
