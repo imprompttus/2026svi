@@ -475,7 +475,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1980px;
+      min-width: 1860px;
       font-size: 13px;
     }
 
@@ -496,8 +496,8 @@
       white-space: nowrap;
     }
 
-    tbody tr:hover {
-      background: #fbfcfa;
+    tbody tr:hover td {
+      background: #e4f3ea;
     }
 
     .company {
@@ -525,13 +525,26 @@
     }
 
     .history-row {
-      background: #f8faf6;
+      background: #fff;
+    }
+
+    .history-row td {
+      background: #fff;
+    }
+
+    .history-row .company {
+      color: #8a938e;
+      font-weight: 500;
     }
 
     .history-owner-text {
-      color: #245343;
-      font-weight: 800;
+      color: #7b8580;
+      font-weight: 500;
       white-space: nowrap;
+    }
+
+    .history-row td {
+      color: #6f7973;
     }
 
     .current-row td {
@@ -568,7 +581,7 @@
     .pill.done { background: var(--green-soft); color: var(--green); }
     .pill.review { background: var(--blue-soft); color: var(--blue); }
     .pill.wait { background: var(--gray-soft); color: #4e5954; }
-    .pill.history { background: #eef3ee; color: #53605a; font-weight: 800; }
+    .pill.history { background: #f1f3f1; color: #6f7973; font-weight: 800; }
     .pill.warn { background: var(--amber-soft); color: var(--amber); }
     .pill.danger { background: var(--red-soft); color: var(--red); }
 
@@ -615,6 +628,36 @@
       width: 108px;
       min-width: 108px;
       max-width: 108px;
+    }
+
+    th:nth-child(6),
+    td:nth-child(6),
+    th:nth-child(7),
+    td:nth-child(7),
+    th:nth-child(8),
+    td:nth-child(8) {
+      width: 100px;
+      min-width: 100px;
+      max-width: 100px;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+
+    th:nth-child(11),
+    td:nth-child(11) {
+      width: 170px;
+      min-width: 170px;
+      max-width: 170px;
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    th:nth-child(13),
+    td:nth-child(13) {
+      width: 180px;
+      min-width: 180px;
+      max-width: 180px;
+      font-size: 12px;
     }
 
     .empty {
@@ -847,8 +890,8 @@
     </main>
   </div>
 
-  <input class="hidden" id="fileInput" type="file" accept=".csv,.xls,.html,text/csv,text/html,application/vnd.ms-excel">
-  <input class="hidden" id="historyFileInput" type="file" accept=".csv,.xls,.html,text/csv,text/html,application/vnd.ms-excel" multiple>
+  <input class="hidden" id="fileInput" type="file" accept=".csv,.xls,.xlsx,.html,text/csv,text/html,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+  <input class="hidden" id="historyFileInput" type="file" accept=".csv,.xls,.xlsx,.html,text/csv,text/html,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple>
 
   <div class="modal" id="csvModal" role="dialog" aria-modal="true" aria-labelledby="csvTitle">
     <div class="modal-panel">
@@ -857,8 +900,8 @@
         <button class="btn" id="closeCsv" type="button">닫기</button>
       </div>
       <div class="field">
-        <label for="csvText">PMS XLS, CSV 또는 표 복사 내용</label>
-        <textarea id="csvText" placeholder="PMS 서류검토관리 목록에서 내려받은 .xls/.csv 파일을 선택하거나 표 복사 내용을 붙여넣기"></textarea>
+        <label for="csvText">PMS XLS, XLSX, CSV 또는 표 복사 내용</label>
+        <textarea id="csvText" placeholder="PMS 서류검토관리 목록에서 내려받은 .xls/.xlsx/.csv 파일을 선택하거나 표 복사 내용을 붙여넣기"></textarea>
       </div>
       <div class="actions">
         <button class="btn" id="chooseFile" type="button">파일 선택</button>
@@ -921,6 +964,7 @@
     const HISTORY_KEY = "svi_dongnam_owner_history_v1";
     const AUTH_KEY = "svi_dongnam_auth_v1";
     const ACCESS_PASSWORD = "1127";
+    const IMPORT_PASSWORD = "0621";
     const CURRENT_OWNERS = ["김규리", "박진국", "배현범", "엄수진", "인선영", "윤수정"];
     const DEFAULT_OWNERS = CURRENT_OWNERS;
     const today = new Date();
@@ -1041,6 +1085,151 @@
 
     function parseImportText(text) {
       return /<\s*(html|table|thead|tbody|tr|td|th)\b/i.test(text) ? parseHtmlTable(text) : parseCsv(text);
+    }
+
+    function isXlsxFile(file) {
+      return /\.xlsx$/i.test(file.name || "") || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    }
+
+    function columnNumber(cellRef) {
+      const letters = String(cellRef || "").match(/^[A-Z]+/i)?.[0] || "A";
+      return [...letters.toUpperCase()].reduce((total, letter) => total * 26 + letter.charCodeAt(0) - 64, 0) - 1;
+    }
+
+    function xmlText(node) {
+      return [...node.getElementsByTagName("t")].map((item) => item.textContent || "").join("");
+    }
+
+    function findZipEntries(buffer) {
+      const bytes = new Uint8Array(buffer);
+      const view = new DataView(buffer);
+      let eocd = -1;
+      for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 66000); i -= 1) {
+        if (view.getUint32(i, true) === 0x06054b50) {
+          eocd = i;
+          break;
+        }
+      }
+      if (eocd < 0) throw new Error("xlsx zip");
+      const count = view.getUint16(eocd + 10, true);
+      let offset = view.getUint32(eocd + 16, true);
+      const entries = {};
+      for (let i = 0; i < count; i += 1) {
+        if (view.getUint32(offset, true) !== 0x02014b50) break;
+        const method = view.getUint16(offset + 10, true);
+        const compressedSize = view.getUint32(offset + 20, true);
+        const nameLength = view.getUint16(offset + 28, true);
+        const extraLength = view.getUint16(offset + 30, true);
+        const commentLength = view.getUint16(offset + 32, true);
+        const localOffset = view.getUint32(offset + 42, true);
+        const nameBytes = bytes.slice(offset + 46, offset + 46 + nameLength);
+        const name = new TextDecoder().decode(nameBytes);
+        const localNameLength = view.getUint16(localOffset + 26, true);
+        const localExtraLength = view.getUint16(localOffset + 28, true);
+        const dataStart = localOffset + 30 + localNameLength + localExtraLength;
+        entries[name] = { method, data: bytes.slice(dataStart, dataStart + compressedSize) };
+        offset += 46 + nameLength + extraLength + commentLength;
+      }
+      return entries;
+    }
+
+    async function inflateZipEntry(entry) {
+      if (entry.method === 0) return entry.data;
+      if (entry.method !== 8 || !("DecompressionStream" in window)) throw new Error("xlsx inflate");
+      const stream = new Blob([entry.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      return new Uint8Array(await new Response(stream).arrayBuffer());
+    }
+
+    async function readZipText(entries, path) {
+      const entry = entries[path];
+      if (!entry) return "";
+      return new TextDecoder("utf-8").decode(await inflateZipEntry(entry));
+    }
+
+    function excelSerialToDate(valueText) {
+      const value = Number(valueText);
+      if (!Number.isFinite(value)) return valueText;
+      const wholeDays = Math.floor(value);
+      const fraction = value - wholeDays;
+      const date = new Date(Date.UTC(1899, 11, 30) + wholeDays * 86400000 + Math.round(fraction * 86400000));
+      const y = date.getUTCFullYear();
+      const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const d = String(date.getUTCDate()).padStart(2, "0");
+      if (fraction <= 0) return `${y}-${m}-${d}`;
+      const hh = String(date.getUTCHours()).padStart(2, "0");
+      const mm = String(date.getUTCMinutes()).padStart(2, "0");
+      const ss = String(date.getUTCSeconds()).padStart(2, "0");
+      return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+    }
+
+    function xlsxDateStyleIds(stylesXml) {
+      if (!stylesXml) return new Set();
+      const builtinDateIds = new Set([14, 15, 16, 17, 18, 19, 20, 21, 22, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58]);
+      const doc = new DOMParser().parseFromString(stylesXml, "application/xml");
+      const customFormats = {};
+      [...doc.getElementsByTagName("numFmt")].forEach((item) => {
+        customFormats[item.getAttribute("numFmtId")] = item.getAttribute("formatCode") || "";
+      });
+      const cellXfs = doc.getElementsByTagName("cellXfs")[0];
+      if (!cellXfs) return new Set();
+      const dateStyles = new Set();
+      [...cellXfs.getElementsByTagName("xf")].forEach((xf, index) => {
+        const numFmtId = Number(xf.getAttribute("numFmtId"));
+        const formatCode = customFormats[String(numFmtId)] || "";
+        if (builtinDateIds.has(numFmtId) || /[ymdhs]/i.test(formatCode.replace(/\[[^\]]+\]/g, ""))) {
+          dateStyles.add(String(index));
+        }
+      });
+      return dateStyles;
+    }
+
+    function sheetXmlToText(sheetXml, sharedStrings, dateStyleIds = new Set()) {
+      const doc = new DOMParser().parseFromString(sheetXml, "application/xml");
+      const rows = [...doc.getElementsByTagName("row")].map((row) => {
+        const cells = [];
+        [...row.getElementsByTagName("c")].forEach((cell) => {
+          const index = columnNumber(cell.getAttribute("r"));
+          const type = cell.getAttribute("t");
+          let valueText = "";
+          if (type === "inlineStr") {
+            valueText = xmlText(cell);
+          } else {
+            valueText = cell.getElementsByTagName("v")[0]?.textContent || "";
+            if (type === "s") valueText = sharedStrings[Number(valueText)] || "";
+            else if (dateStyleIds.has(cell.getAttribute("s"))) valueText = excelSerialToDate(valueText);
+          }
+          cells[index] = normalizeHeader(valueText);
+        });
+        return cells;
+      });
+      return rows.map((row) => row.map((cell) => cell || "").join("\t")).join("\n");
+    }
+
+    async function xlsxFileToText(file) {
+      const entries = findZipEntries(await file.arrayBuffer());
+      const sharedXml = await readZipText(entries, "xl/sharedStrings.xml");
+      const sharedStrings = sharedXml
+        ? [...new DOMParser().parseFromString(sharedXml, "application/xml").getElementsByTagName("si")].map(xmlText)
+        : [];
+      const workbookXml = await readZipText(entries, "xl/workbook.xml");
+      const relsXml = await readZipText(entries, "xl/_rels/workbook.xml.rels");
+      const dateStyleIds = xlsxDateStyleIds(await readZipText(entries, "xl/styles.xml"));
+      let sheetPath = "xl/worksheets/sheet1.xml";
+      if (workbookXml && relsXml) {
+        const workbook = new DOMParser().parseFromString(workbookXml, "application/xml");
+        const firstSheet = workbook.getElementsByTagName("sheet")[0];
+        const relId = firstSheet?.getAttribute("r:id");
+        const rels = new DOMParser().parseFromString(relsXml, "application/xml");
+        const rel = [...rels.getElementsByTagName("Relationship")].find((item) => item.getAttribute("Id") === relId);
+        if (rel?.getAttribute("Target")) sheetPath = `xl/${rel.getAttribute("Target").replace(/^\/?xl\//, "")}`;
+      }
+      const sheetXml = await readZipText(entries, sheetPath);
+      if (!sheetXml) throw new Error("xlsx sheet");
+      return sheetXmlToText(sheetXml, sharedStrings, dateStyleIds);
+    }
+
+    async function readImportFile(file) {
+      return isXlsxFile(file) ? xlsxFileToText(file) : file.text();
     }
 
     function firstValue(row, keys) {
@@ -1699,6 +1888,16 @@
       loadSheet();
     }
 
+    function openImportModal() {
+      const password = window.prompt("PMS 파일 추가 비밀번호를 입력하세요.");
+      if (password === null) return;
+      if (password !== IMPORT_PASSWORD) {
+        window.alert("비밀번호가 맞지 않습니다.");
+        return;
+      }
+      $("csvModal").classList.add("open");
+    }
+
     function loadCsvText(text) {
       const parsed = parseImportText(text);
       if (!parsed.length) {
@@ -1733,11 +1932,15 @@
     async function loadHistoryFiles(files) {
       let added = 0;
       for (const file of files) {
-        const parsed = parseImportText(await file.text());
-        const records = collectHistoryRecords(parsed, file.name);
-        if (records.length) {
-          mergeHistory(records);
-          added += records.length;
+        try {
+          const parsed = parseImportText(await readImportFile(file));
+          const records = collectHistoryRecords(parsed, file.name);
+          if (records.length) {
+            mergeHistory(records);
+            added += records.length;
+          }
+        } catch {
+          setSourceState(`${file.name} 파일을 읽지 못했습니다`);
         }
       }
       if (!added) {
@@ -1757,7 +1960,7 @@
       $(id).addEventListener("change", render);
     });
 
-    $("csvBtn").addEventListener("click", () => $("csvModal").classList.add("open"));
+    $("csvBtn").addEventListener("click", openImportModal);
     $("closeCsv").addEventListener("click", () => $("csvModal").classList.remove("open"));
     $("statsBtn").addEventListener("click", () => $("statsModal").classList.add("open"));
     $("closeStats").addEventListener("click", () => $("statsModal").classList.remove("open"));
@@ -1780,7 +1983,11 @@
     $("fileInput").addEventListener("change", async (event) => {
       const file = event.target.files[0];
       if (!file) return;
-      loadCsvText(await file.text());
+      try {
+        loadCsvText(await readImportFile(file));
+      } catch {
+        setSourceState("XLSX 파일을 읽지 못했습니다. CSV 또는 XLS로 내려받아 다시 시도해주세요.");
+      }
       event.target.value = "";
     });
     $("historyFileInput").addEventListener("change", async (event) => {
