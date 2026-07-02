@@ -627,7 +627,8 @@
     }
 
     .coaching-check,
-    .jump-check {
+    .jump-check,
+    .etc-check {
       inline-size: 18px;
       block-size: 18px;
       accent-color: var(--green);
@@ -717,28 +718,46 @@
 
     .table-wrap th:nth-child(11),
     .table-wrap td:nth-child(11) {
-      width: 170px;
-      min-width: 170px;
-      max-width: 170px;
+      width: 130px;
+      min-width: 130px;
+      max-width: 130px;
       font-size: 12px;
       line-height: 1.25;
     }
 
     .table-wrap th:nth-child(13),
     .table-wrap td:nth-child(13) {
-      width: 180px;
-      min-width: 180px;
-      max-width: 180px;
+      width: 145px;
+      min-width: 145px;
+      max-width: 145px;
       font-size: 12px;
+    }
+
+    .table-wrap th:nth-child(17),
+    .table-wrap td:nth-child(17) {
+      width: 58px;
+      min-width: 58px;
+      max-width: 58px;
+      white-space: nowrap;
+    }
+
+    .table-wrap th:nth-child(18),
+    .table-wrap td:nth-child(18) {
+      width: 58px;
+      min-width: 58px;
+      max-width: 58px;
+      white-space: nowrap;
     }
 
     .table-wrap th:nth-child(19),
     .table-wrap td:nth-child(19),
     .table-wrap th:nth-child(20),
-    .table-wrap td:nth-child(20) {
-      width: 74px;
-      min-width: 74px;
-      max-width: 74px;
+    .table-wrap td:nth-child(20),
+    .table-wrap th:nth-child(21),
+    .table-wrap td:nth-child(21) {
+      width: 66px;
+      min-width: 66px;
+      max-width: 66px;
       text-align: center;
       padding-left: 8px;
       padding-right: 8px;
@@ -896,7 +915,7 @@
       <section class="toolbar" aria-label="필터">
         <div class="field">
           <label for="searchInput">검색</label>
-          <input id="searchInput" type="search" placeholder="기업명, 지역, 담당자, 측정자">
+          <input id="searchInput" type="search" placeholder="기업명, 지역, 담당자, 측정자 · 쉼표로 여러 개 검색">
         </div>
         <div class="field">
           <label for="statusFilter">상태</label>
@@ -938,7 +957,7 @@
           <label for="sortSelect">정렬</label>
           <select id="sortSelect">
             <option value="applyDesc">신청일 최신순</option>
-            <option value="applyAsc">신청일 오래된순</option>
+            <option value="applyAsc" selected>신청일 오래된순</option>
             <option value="dueAsc">보완마감 빠른순</option>
             <option value="companyAsc">기업명 가나다순</option>
             <option value="scoreDesc">점수 높은순</option>
@@ -984,6 +1003,7 @@
                   <th>점수</th>
                   <th>심화코칭</th>
                   <th>도약지원</th>
+                  <th>기타</th>
                 </tr>
               </thead>
               <tbody id="companyRows"></tbody>
@@ -1071,6 +1091,7 @@
     const OWNER_CONFIRMED_KEY = "svi_dongnam_owner_confirmed_v1";
     const COACHING_OVERRIDES_KEY = "svi_dongnam_coaching_overrides_v1";
     const JUMP_OVERRIDES_KEY = "svi_dongnam_jump_overrides_v1";
+    const ETC_OVERRIDES_KEY = "svi_dongnam_etc_overrides_v1";
     const HISTORY_KEY = "svi_dongnam_owner_history_v1";
     const AUTH_KEY = "svi_dongnam_auth_v1";
     const ACCESS_PASSWORD = "1127";
@@ -1384,6 +1405,7 @@
         "점수": ["점수", "총계", "총점"],
         "심화코칭": ["심화코칭", "심화코칭 여부", "심화코칭여부"],
         "도약지원": ["도약지원", "도약 지원", "도약지원 여부", "도약지원여부", "도약"],
+        "기타": ["기타", "기타 여부", "기타여부"],
         "진행상태": ["진행상태"]
       };
 
@@ -1526,6 +1548,18 @@
 
     function saveJumpOverrides(overrides) {
       localStorage.setItem(JUMP_OVERRIDES_KEY, JSON.stringify(overrides));
+    }
+
+    function loadEtcOverrides() {
+      try {
+        return JSON.parse(localStorage.getItem(ETC_OVERRIDES_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveEtcOverrides(overrides) {
+      localStorage.setItem(ETC_OVERRIDES_KEY, JSON.stringify(overrides));
     }
 
     function normalizeCompanyName(name) {
@@ -1699,6 +1733,15 @@
       saveJumpOverrides(overrides);
     }
 
+    function rememberCurrentEtc() {
+      const overrides = loadEtcOverrides();
+      rows.forEach((row) => {
+        const key = recordKey(row);
+        if (key && value(row, ["기타"])) overrides[key] = isCheckedValue(value(row, ["기타"]));
+      });
+      saveEtcOverrides(overrides);
+    }
+
     function applyOwnerOverrides(list) {
       const overrides = loadOwnerOverrides();
       const confirmed = loadOwnerConfirmed();
@@ -1752,8 +1795,17 @@
       });
     }
 
+    function applyEtcOverrides(list) {
+      const overrides = loadEtcOverrides();
+      return list.map((row) => {
+        const key = recordKey(row);
+        if (key && Object.prototype.hasOwnProperty.call(overrides, key)) return { ...row, "기타": overrides[key] ? "Y" : "" };
+        return row;
+      });
+    }
+
     function applyAllOverrides(list) {
-      return applyJumpOverrides(applyCoachingOverrides(applyOwnerOverrides(list)));
+      return applyEtcOverrides(applyJumpOverrides(applyCoachingOverrides(applyOwnerOverrides(list))));
     }
 
     function saveLocal() {
@@ -1785,6 +1837,7 @@
         ownerConfirmed: loadOwnerConfirmed(),
         coachingOverrides: loadCoachingOverrides(),
         jumpOverrides: loadJumpOverrides(),
+        etcOverrides: loadEtcOverrides(),
         history: loadStoredJson(HISTORY_KEY, {}),
         updatedAt: new Date().toISOString()
       };
@@ -1821,6 +1874,7 @@
       if (state.ownerConfirmed) localStorage.setItem(OWNER_CONFIRMED_KEY, JSON.stringify(state.ownerConfirmed));
       if (state.coachingOverrides) localStorage.setItem(COACHING_OVERRIDES_KEY, JSON.stringify(state.coachingOverrides));
       if (state.jumpOverrides) localStorage.setItem(JUMP_OVERRIDES_KEY, JSON.stringify(state.jumpOverrides));
+      if (state.etcOverrides) localStorage.setItem(ETC_OVERRIDES_KEY, JSON.stringify(state.etcOverrides));
       if (state.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history));
       rows = applyAllOverrides(state.rows);
       return true;
@@ -1894,6 +1948,18 @@
       return String(Math.round(number * 10) / 10);
     }
 
+    function searchTerms() {
+      return $("searchInput").value
+        .split(",")
+        .map((term) => term.trim().toLowerCase())
+        .filter(Boolean);
+    }
+
+    function matchesSearch(haystack, terms) {
+      if (!terms.length) return true;
+      return terms.some((term) => haystack.includes(term));
+    }
+
     function renderRoundButtons() {
       const counts = { all: rows.length, 1: 0, 2: 0, 3: 0 };
       rows.forEach((row) => {
@@ -1920,7 +1986,7 @@
     }
 
     function filteredRows() {
-      const q = $("searchInput").value.trim().toLowerCase();
+      const terms = searchTerms();
       const status = $("statusFilter").value;
       const region = $("regionFilter").value;
       const owner = $("ownerFilter").value;
@@ -1943,11 +2009,14 @@
         if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
         if (!optionFilterMatches(coaching, isCheckedValue(value(row, ["심화코칭"])))) return false;
         if (!optionFilterMatches(jump, isCheckedValue(value(row, ["도약지원"])))) return false;
-        return !q || haystack.includes(q);
+        return matchesSearch(haystack, terms);
       });
 
-      const historyMatches = q && status === "all" && owner === "all" && coaching === "all" && jump === "all"
-        ? historySearchRows(q).filter((row) => region === "all" || value(row, ["지역"]) === region)
+      const historyMatches = terms.length && status === "all" && owner === "all" && coaching === "all" && jump === "all"
+        ? terms.flatMap((term) => historySearchRows(term)).filter((row, index, list) =>
+            list.findIndex((item) => recordKey(item) === recordKey(row)) === index &&
+            (region === "all" || value(row, ["지역"]) === region)
+          )
         : [];
       const result = [...currentResult, ...historyMatches];
 
@@ -1963,7 +2032,7 @@
     }
 
     function metricBaseRows() {
-      const q = $("searchInput").value.trim().toLowerCase();
+      const terms = searchTerms();
       const region = $("regionFilter").value;
       const owner = $("ownerFilter").value;
       const coaching = $("coachingFilter").value;
@@ -1981,7 +2050,7 @@
         if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
         if (!optionFilterMatches(coaching, isCheckedValue(value(row, ["심화코칭"])))) return false;
         if (!optionFilterMatches(jump, isCheckedValue(value(row, ["도약지원"])))) return false;
-        return !q || haystack.includes(q);
+        return matchesSearch(haystack, terms);
       });
     }
 
@@ -2089,7 +2158,7 @@
     function renderTable(list) {
       const body = $("companyRows");
       if (!list.length) {
-        body.innerHTML = '<tr><td colspan="20" class="empty">표시할 기업이 없습니다.</td></tr>';
+        body.innerHTML = '<tr><td colspan="21" class="empty">표시할 기업이 없습니다.</td></tr>';
         return;
       }
       const owners = ownerOptions();
@@ -2116,6 +2185,7 @@
             </div>`;
         const coachingCheck = `<input class="coaching-check" type="checkbox" data-coaching-key="${escapeHtml(key)}" aria-label="심화코칭 해당" ${isCheckedValue(value(row, ["심화코칭"])) ? "checked" : ""}>`;
         const jumpCheck = `<input class="jump-check" type="checkbox" data-jump-key="${escapeHtml(key)}" aria-label="도약지원 해당" ${isCheckedValue(value(row, ["도약지원"])) ? "checked" : ""}>`;
+        const etcCheck = `<input class="etc-check" type="checkbox" data-etc-key="${escapeHtml(key)}" aria-label="기타 해당" ${isCheckedValue(value(row, ["기타"])) ? "checked" : ""}>`;
         return `
           <tr class="${row._historyRow ? "history-row" : "current-row"}">
             <td><span class="pill ${state.className}">${state.label}</span></td>
@@ -2138,6 +2208,7 @@
             <td>${escapeHtml(formatScore(value(row, ["점수"])))}</td>
             <td>${row._historyRow ? "-" : coachingCheck}</td>
             <td>${row._historyRow ? "-" : jumpCheck}</td>
+            <td>${row._historyRow ? "-" : etcCheck}</td>
           </tr>
         `;
       }).join("");
@@ -2193,6 +2264,15 @@
       render();
     }
 
+    function setEtcOverride(key, checked) {
+      const overrides = loadEtcOverrides();
+      overrides[key] = Boolean(checked);
+      saveEtcOverrides(overrides);
+      rows = rows.map((row) => recordKey(row) === key ? { ...row, "기타": checked ? "Y" : "" } : row);
+      saveLocal();
+      render();
+    }
+
     async function loadSheet() {
       setSourceState("시트 연결 중");
       try {
@@ -2204,6 +2284,7 @@
         rememberCurrentOwners();
         rememberCurrentCoaching();
         rememberCurrentJump();
+        rememberCurrentEtc();
         rows = applyAllOverrides(parsed);
         saveLocal();
         setSourceState(`구글시트 동기화 · ${rows.length}건`);
@@ -2255,6 +2336,7 @@
       rememberCurrentOwners();
       rememberCurrentCoaching();
       rememberCurrentJump();
+      rememberCurrentEtc();
       rows = applyAllOverrides(parsed);
       saveLocal();
       $("csvModal").classList.remove("open");
@@ -2337,6 +2419,10 @@
       }
       if (event.target.classList.contains("jump-check")) {
         setJumpOverride(event.target.dataset.jumpKey, event.target.checked);
+        return;
+      }
+      if (event.target.classList.contains("etc-check")) {
+        setEtcOverride(event.target.dataset.etcKey, event.target.checked);
       }
     });
     $("companyRows").addEventListener("click", (event) => {
