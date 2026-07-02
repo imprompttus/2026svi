@@ -1018,6 +1018,10 @@
   <script src="current-owner-data.js"></script>
   <script>
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1qNWCt306t_ChoGoGQyKcDeUnDvlKvvAazMyP89nM-Zw/export?format=csv&gid=1101761887";
+    const SUPABASE_URL = "https://lczjecktxbqkpdyayhmy.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_S4r1JQIyJ8sFA5phKw8tyg_r49FtQvd";
+    const SUPABASE_TABLE = "svi_companies";
+    const SUPABASE_STATE_ID = "svi_dongnam_dashboard_state";
     const STORAGE_KEY = "svi_dongnam_companies_v1";
     const OWNER_OVERRIDES_KEY = "svi_dongnam_owner_overrides_v1";
     const OWNER_CONFIRMED_KEY = "svi_dongnam_owner_confirmed_v1";
@@ -1026,7 +1030,7 @@
     const AUTH_KEY = "svi_dongnam_auth_v1";
     const ACCESS_PASSWORD = "1127";
     const IMPORT_PASSWORD = "0621";
-    const CURRENT_OWNERS = ["김규리", "박진국", "배현범", "엄수진", "인선영", "윤수정"];
+    const CURRENT_OWNERS = ["김규리", "박진국", "배현범", "엄수진", "인선영", "윤수정", "유정용"];
     const DEFAULT_OWNERS = CURRENT_OWNERS;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1068,6 +1072,8 @@
 
     let rows = [];
     let activeRound = "2";
+    let cloudReady = false;
+    let cloudSaveTimer = null;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1660,6 +1666,7 @@
 
     function saveLocal() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
+      scheduleCloudSave();
     }
 
     function loadLocal() {
@@ -1668,6 +1675,88 @@
       } catch {
         return [];
       }
+    }
+
+    function loadStoredJson(key, fallback) {
+      try {
+        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+      } catch {
+        return fallback;
+      }
+    }
+
+    function buildCloudState() {
+      return {
+        version: 1,
+        rows,
+        ownerOverrides: loadOwnerOverrides(),
+        ownerConfirmed: loadOwnerConfirmed(),
+        coachingOverrides: loadCoachingOverrides(),
+        history: loadStoredJson(HISTORY_KEY, {}),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function supabaseHeaders(extra = {}) {
+      return {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        ...extra
+      };
+    }
+
+    async function loadCloudState() {
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${encodeURIComponent(SUPABASE_STATE_ID)}&select=data&limit=1`;
+        const response = await fetch(url, {
+          headers: supabaseHeaders(),
+          cache: "no-store"
+        });
+        if (!response.ok) throw new Error("cloud-load");
+        const list = await response.json();
+        return list?.[0]?.data || null;
+      } catch {
+        return null;
+      }
+    }
+
+    function applyCloudState(state) {
+      if (!state || !Array.isArray(state.rows) || !state.rows.length) return false;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+      if (state.ownerOverrides) localStorage.setItem(OWNER_OVERRIDES_KEY, JSON.stringify(state.ownerOverrides));
+      if (state.ownerConfirmed) localStorage.setItem(OWNER_CONFIRMED_KEY, JSON.stringify(state.ownerConfirmed));
+      if (state.coachingOverrides) localStorage.setItem(COACHING_OVERRIDES_KEY, JSON.stringify(state.coachingOverrides));
+      if (state.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history));
+      rows = applyCoachingOverrides(applyOwnerOverrides(state.rows));
+      return true;
+    }
+
+    async function saveCloudStateNow() {
+      if (!cloudReady) return;
+      const state = buildCloudState();
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=id`, {
+          method: "POST",
+          headers: supabaseHeaders({ Prefer: "resolution=merge-duplicates,return=minimal" }),
+          body: JSON.stringify({
+            id: SUPABASE_STATE_ID,
+            name: "SVI Dongnam dashboard state",
+            data: state,
+            updated_at: state.updatedAt
+          })
+        });
+        if (!response.ok) throw new Error("cloud-save");
+        setSourceState(`공용 DB 저장 완료 · ${rows.length}건`);
+      } catch {
+        setSourceState(`브라우저 저장 데이터 · ${rows.length}건 · 공용 DB 저장 실패`);
+      }
+    }
+
+    function scheduleCloudSave() {
+      if (!cloudReady) return;
+      window.clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = window.setTimeout(saveCloudStateNow, 700);
     }
 
     function uniqueValues(keySet) {
@@ -2012,12 +2101,21 @@
       }
     }
 
-    function loadInitialData() {
+    async function loadInitialData() {
+      setSourceState("공용 DB 연결 중...");
+      const cloudState = await loadCloudState();
+      cloudReady = true;
+      if (applyCloudState(cloudState)) {
+        setSourceState(`공용 DB 데이터 · ${rows.length}건`);
+        render();
+        return;
+      }
       const local = loadLocal();
       if (local.length) {
         rows = applyCoachingOverrides(applyOwnerOverrides(local));
         setSourceState(`브라우저 저장 데이터 · ${rows.length}건`);
         render();
+        scheduleCloudSave();
         return;
       }
       loadSheet();
