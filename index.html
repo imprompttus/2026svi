@@ -536,6 +536,51 @@
       max-width: 160px;
     }
 
+    .company-note-btn {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .company-note-btn:hover {
+      color: var(--green);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .memo-row td {
+      background: #fbfdfb !important;
+      padding: 12px 16px;
+    }
+
+    .memo-box {
+      display: grid;
+      gap: 6px;
+      max-width: 720px;
+    }
+
+    .memo-box label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .memo-box textarea {
+      width: 100%;
+      min-height: 74px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      resize: vertical;
+      line-height: 1.45;
+      color: var(--ink);
+    }
+
     .owner-cell {
       min-width: 76px;
     }
@@ -894,6 +939,10 @@
             <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span>
             상담일지
           </a>
+          <a class="btn shortcut" href="https://docs.google.com/spreadsheets/d/1qNWCt306t_ChoGoGQyKcDeUnDvlKvvAazMyP89nM-Zw/edit?gid=1199186759#gid=1199186759" target="_blank" rel="noopener noreferrer">
+            <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M9 4v16"/></svg></span>
+            심화코칭 신청폼
+          </a>
           <a class="btn shortcut" href="https://drive.google.com/drive/folders/1HA87TV8yG90jJNT_gI9t_F8D4x9M9ZHZ" target="_blank" rel="noopener noreferrer">
             <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8 12 3 7 8"/><path d="M12 3v12"/></svg></span>
             심화코칭 업로드
@@ -947,6 +996,7 @@
             <option value="scoreDesc">점수 높은순</option>
             <option value="coachingOnly">심화코칭</option>
             <option value="jumpOnly">도약지원</option>
+            <option value="etcOnly">기타</option>
           </select>
         </div>
       </section>
@@ -1078,6 +1128,7 @@
     const COACHING_OVERRIDES_KEY = "svi_dongnam_coaching_overrides_v1";
     const JUMP_OVERRIDES_KEY = "svi_dongnam_jump_overrides_v1";
     const ETC_OVERRIDES_KEY = "svi_dongnam_etc_overrides_v1";
+    const MEMO_OVERRIDES_KEY = "svi_dongnam_memo_overrides_v1";
     const HISTORY_KEY = "svi_dongnam_owner_history_v1";
     const AUTH_KEY = "svi_dongnam_auth_v1";
     const ACCESS_PASSWORD = "1127";
@@ -1126,6 +1177,7 @@
     let activeRound = "2";
     let cloudReady = false;
     let cloudSaveTimer = null;
+    let openMemoKey = "";
 
     const $ = (id) => document.getElementById(id);
 
@@ -1548,6 +1600,18 @@
       localStorage.setItem(ETC_OVERRIDES_KEY, JSON.stringify(overrides));
     }
 
+    function loadMemoOverrides() {
+      try {
+        return JSON.parse(localStorage.getItem(MEMO_OVERRIDES_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveMemoOverrides(overrides) {
+      localStorage.setItem(MEMO_OVERRIDES_KEY, JSON.stringify(overrides));
+    }
+
     function normalizeCompanyName(name) {
       return String(name || "")
         .toLowerCase()
@@ -1665,12 +1729,7 @@
       const normalizedQuery = String(query || "").trim().toLowerCase();
       if (!normalizedQuery) return [];
       return (window.SVI_BUILTIN_HISTORY || [])
-        .filter((record) => [
-          record.company,
-          record.owner,
-          record.region,
-          record.assessor
-        ].join(" ").toLowerCase().includes(normalizedQuery))
+        .filter((record) => String(record.company || "").toLowerCase().includes(normalizedQuery))
         .map(historyRecordToRow);
     }
 
@@ -1818,6 +1877,7 @@
         coachingOverrides: loadCoachingOverrides(),
         jumpOverrides: loadJumpOverrides(),
         etcOverrides: loadEtcOverrides(),
+        memoOverrides: loadMemoOverrides(),
         history: loadStoredJson(HISTORY_KEY, {}),
         updatedAt: new Date().toISOString()
       };
@@ -1855,6 +1915,7 @@
       if (state.coachingOverrides) localStorage.setItem(COACHING_OVERRIDES_KEY, JSON.stringify(state.coachingOverrides));
       if (state.jumpOverrides) localStorage.setItem(JUMP_OVERRIDES_KEY, JSON.stringify(state.jumpOverrides));
       if (state.etcOverrides) localStorage.setItem(ETC_OVERRIDES_KEY, JSON.stringify(state.etcOverrides));
+      if (state.memoOverrides) localStorage.setItem(MEMO_OVERRIDES_KEY, JSON.stringify(state.memoOverrides));
       if (state.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history));
       rows = applyAllOverrides(state.rows);
       return true;
@@ -1987,10 +2048,11 @@
         if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
         if (sort === "coachingOnly" && !isCheckedValue(value(row, ["심화코칭"]))) return false;
         if (sort === "jumpOnly" && !isCheckedValue(value(row, ["도약지원"]))) return false;
+        if (sort === "etcOnly" && !isCheckedValue(value(row, ["기타"]))) return false;
         return matchesSearch(haystack, terms);
       });
 
-      const historyMatches = terms.length && status === "all" && owner === "all" && sort !== "coachingOnly" && sort !== "jumpOnly"
+      const historyMatches = terms.length && status === "all" && owner === "all" && sort !== "coachingOnly" && sort !== "jumpOnly" && sort !== "etcOnly"
         ? terms.flatMap((term) => historySearchRows(term)).filter((row, index, list) =>
             list.findIndex((item) => recordKey(item) === recordKey(row)) === index &&
             (region === "all" || value(row, ["지역"]) === region)
@@ -2027,6 +2089,7 @@
         if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
         if (sort === "coachingOnly" && !isCheckedValue(value(row, ["심화코칭"]))) return false;
         if (sort === "jumpOnly" && !isCheckedValue(value(row, ["도약지원"]))) return false;
+        if (sort === "etcOnly" && !isCheckedValue(value(row, ["기타"]))) return false;
         return matchesSearch(haystack, terms);
       });
     }
@@ -2139,6 +2202,7 @@
         return;
       }
       const owners = ownerOptions();
+      const memoOverrides = loadMemoOverrides();
       body.innerHTML = list.map((row) => {
         const state = statusOf(row);
         const selectedOwner = currentOwnerValue(row);
@@ -2163,11 +2227,24 @@
         const coachingCheck = `<input class="coaching-check" type="checkbox" data-coaching-key="${escapeHtml(key)}" aria-label="심화코칭 해당" ${isCheckedValue(value(row, ["심화코칭"])) ? "checked" : ""}>`;
         const jumpCheck = `<input class="jump-check" type="checkbox" data-jump-key="${escapeHtml(key)}" aria-label="도약지원 해당" ${isCheckedValue(value(row, ["도약지원"])) ? "checked" : ""}>`;
         const etcCheck = `<input class="etc-check" type="checkbox" data-etc-key="${escapeHtml(key)}" aria-label="기타 해당" ${isCheckedValue(value(row, ["기타"])) ? "checked" : ""}>`;
+        const companyName = value(row, ["기업명"]);
+        const memo = memoOverrides[key] || "";
+        const companyCell = row._historyRow
+          ? escapeHtml(companyName)
+          : `<button class="company-note-btn" type="button" data-memo-open="${escapeHtml(key)}" title="메모 열기">${escapeHtml(companyName)}${memo ? " *" : ""}</button>`;
+        const memoRow = !row._historyRow && openMemoKey === key
+          ? `<tr class="memo-row"><td colspan="21">
+              <div class="memo-box">
+                <label for="memo-${escapeHtml(key)}">기업 메모</label>
+                <textarea id="memo-${escapeHtml(key)}" data-memo-key="${escapeHtml(key)}" placeholder="메모를 입력하세요">${escapeHtml(memo)}</textarea>
+              </div>
+            </td></tr>`
+          : "";
         return `
           <tr class="${row._historyRow ? "history-row" : "current-row"}">
             <td><span class="pill ${state.className}">${state.label}</span></td>
             <td>${escapeHtml(getRound(row))}</td>
-            <td class="company">${escapeHtml(value(row, ["기업명"]))}</td>
+            <td class="company">${companyCell}</td>
             <td>${escapeHtml(value(row, ["신청일자"]))}</td>
             <td>${ownerCell}</td>
             <td>${escapeHtml(value(row, ["보완요청일"]))}</td>
@@ -2186,7 +2263,7 @@
             <td>${row._historyRow ? "-" : coachingCheck}</td>
             <td>${row._historyRow ? "-" : jumpCheck}</td>
             <td>${row._historyRow ? "-" : etcCheck}</td>
-          </tr>
+          </tr>${memoRow}
         `;
       }).join("");
     }
@@ -2248,6 +2325,15 @@
       rows = rows.map((row) => recordKey(row) === key ? { ...row, "기타": checked ? "Y" : "" } : row);
       saveLocal();
       render();
+    }
+
+    function setMemoOverride(key, memo) {
+      const overrides = loadMemoOverrides();
+      const text = String(memo || "").trim();
+      if (text) overrides[key] = text;
+      else delete overrides[key];
+      saveMemoOverrides(overrides);
+      saveLocal();
     }
 
     async function loadSheet() {
@@ -2402,7 +2488,20 @@
         setEtcOverride(event.target.dataset.etcKey, event.target.checked);
       }
     });
+    $("companyRows").addEventListener("input", (event) => {
+      if (event.target.matches("textarea[data-memo-key]")) {
+        setMemoOverride(event.target.dataset.memoKey, event.target.value);
+      }
+    });
     $("companyRows").addEventListener("click", (event) => {
+      const memoTrigger = event.target.closest("[data-memo-open]");
+      if (memoTrigger) {
+        openMemoKey = openMemoKey === memoTrigger.dataset.memoOpen ? "" : memoTrigger.dataset.memoOpen;
+        renderTable(filteredRows());
+        const memo = [...document.querySelectorAll("textarea[data-memo-key]")].find((item) => item.dataset.memoKey === openMemoKey);
+        if (memo) memo.focus();
+        return;
+      }
       const trigger = event.target.closest(".owner-display");
       if (!trigger) return;
       const cell = trigger.closest(".owner-cell");
