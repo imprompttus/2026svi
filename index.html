@@ -2240,6 +2240,9 @@
       trigger.classList.add("hidden");
       select.classList.remove("hidden");
       select.focus();
+      if (typeof select.showPicker === "function") {
+        window.requestAnimationFrame(() => select.showPicker());
+      }
     });
     $("companyRows").addEventListener("focusout", (event) => {
       if (!event.target.classList.contains("owner-select")) return;
