@@ -270,7 +270,7 @@
       box-shadow: var(--shadow);
       padding: 12px;
       display: grid;
-      grid-template-columns: minmax(240px, 1.3fr) repeat(6, minmax(118px, 0.55fr));
+      grid-template-columns: 1.4fr repeat(4, minmax(140px, 0.55fr));
       gap: 10px;
     }
 
@@ -938,22 +938,6 @@
           <select id="ownerFilter"><option value="all">전체</option></select>
         </div>
         <div class="field">
-          <label for="coachingFilter">심화코칭</label>
-          <select id="coachingFilter">
-            <option value="all">전체</option>
-            <option value="yes">체크</option>
-            <option value="no">미체크</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="jumpFilter">도약지원</label>
-          <select id="jumpFilter">
-            <option value="all">전체</option>
-            <option value="yes">체크</option>
-            <option value="no">미체크</option>
-          </select>
-        </div>
-        <div class="field">
           <label for="sortSelect">정렬</label>
           <select id="sortSelect">
             <option value="applyDesc">신청일 최신순</option>
@@ -961,6 +945,8 @@
             <option value="dueAsc">보완마감 빠른순</option>
             <option value="companyAsc">기업명 가나다순</option>
             <option value="scoreDesc">점수 높은순</option>
+            <option value="coachingOnly">심화코칭</option>
+            <option value="jumpOnly">도약지원</option>
           </select>
         </div>
       </section>
@@ -1692,12 +1678,6 @@
       return /^(y|yes|true|1|대상|해당|o|○|✓|✔)$/i.test(String(value || "").trim());
     }
 
-    function optionFilterMatches(filterValue, checked) {
-      if (filterValue === "yes") return checked;
-      if (filterValue === "no") return !checked;
-      return true;
-    }
-
     function scoreNumber(row) {
       const raw = String(value(row, ["점수"]) || "").replace(/,/g, "").trim();
       const number = Number.parseFloat(raw);
@@ -1990,8 +1970,6 @@
       const status = $("statusFilter").value;
       const region = $("regionFilter").value;
       const owner = $("ownerFilter").value;
-      const coaching = $("coachingFilter").value;
-      const jump = $("jumpFilter").value;
       const sort = $("sortSelect").value;
 
       const currentResult = rows.filter((row) => {
@@ -2007,12 +1985,12 @@
         if (status !== "all" && state.key !== status) return false;
         if (region !== "all" && value(row, ["지역"]) !== region) return false;
         if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
-        if (!optionFilterMatches(coaching, isCheckedValue(value(row, ["심화코칭"])))) return false;
-        if (!optionFilterMatches(jump, isCheckedValue(value(row, ["도약지원"])))) return false;
+        if (sort === "coachingOnly" && !isCheckedValue(value(row, ["심화코칭"]))) return false;
+        if (sort === "jumpOnly" && !isCheckedValue(value(row, ["도약지원"]))) return false;
         return matchesSearch(haystack, terms);
       });
 
-      const historyMatches = terms.length && status === "all" && owner === "all" && coaching === "all" && jump === "all"
+      const historyMatches = terms.length && status === "all" && owner === "all" && sort !== "coachingOnly" && sort !== "jumpOnly"
         ? terms.flatMap((term) => historySearchRows(term)).filter((row, index, list) =>
             list.findIndex((item) => recordKey(item) === recordKey(row)) === index &&
             (region === "all" || value(row, ["지역"]) === region)
@@ -2035,8 +2013,7 @@
       const terms = searchTerms();
       const region = $("regionFilter").value;
       const owner = $("ownerFilter").value;
-      const coaching = $("coachingFilter").value;
-      const jump = $("jumpFilter").value;
+      const sort = $("sortSelect").value;
       return rows.filter((row) => {
         const haystack = [
           value(row, ["기업명"]),
@@ -2048,8 +2025,8 @@
         if (activeRound !== "all" && getRound(row) !== activeRound) return false;
         if (region !== "all" && value(row, ["지역"]) !== region) return false;
         if (owner !== "all" && currentOwnerValue(row) !== owner) return false;
-        if (!optionFilterMatches(coaching, isCheckedValue(value(row, ["심화코칭"])))) return false;
-        if (!optionFilterMatches(jump, isCheckedValue(value(row, ["도약지원"])))) return false;
+        if (sort === "coachingOnly" && !isCheckedValue(value(row, ["심화코칭"]))) return false;
+        if (sort === "jumpOnly" && !isCheckedValue(value(row, ["도약지원"]))) return false;
         return matchesSearch(haystack, terms);
       });
     }
@@ -2386,7 +2363,7 @@
       render();
     }
 
-    ["searchInput", "statusFilter", "regionFilter", "ownerFilter", "coachingFilter", "jumpFilter", "sortSelect"].forEach((id) => {
+    ["searchInput", "statusFilter", "regionFilter", "ownerFilter", "sortSelect"].forEach((id) => {
       $(id).addEventListener("input", render);
       $(id).addEventListener("change", render);
     });
