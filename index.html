@@ -996,7 +996,7 @@
             <option value="scoreDesc">점수 높은순</option>
             <option value="coachingOnly">심화코칭</option>
             <option value="jumpOnly">도약지원</option>
-            <option value="etcOnly">기타</option>
+            <option value="etcOnly">LH</option>
           </select>
         </div>
       </section>
@@ -1039,7 +1039,7 @@
                   <th>점수</th>
                   <th>심화코칭</th>
                   <th>도약지원</th>
-                  <th>기타</th>
+                  <th>LH</th>
                 </tr>
               </thead>
               <tbody id="companyRows"></tbody>
@@ -1443,7 +1443,7 @@
         "점수": ["점수", "총계", "총점"],
         "심화코칭": ["심화코칭", "심화코칭 여부", "심화코칭여부"],
         "도약지원": ["도약지원", "도약 지원", "도약지원 여부", "도약지원여부", "도약"],
-        "기타": ["기타", "기타 여부", "기타여부"],
+        "기타": ["기타", "기타 여부", "기타여부", "LH", "LH 여부", "LH여부"],
         "진행상태": ["진행상태"]
       };
 
@@ -2226,7 +2226,7 @@
             </div>`;
         const coachingCheck = `<input class="coaching-check" type="checkbox" data-coaching-key="${escapeHtml(key)}" aria-label="심화코칭 해당" ${isCheckedValue(value(row, ["심화코칭"])) ? "checked" : ""}>`;
         const jumpCheck = `<input class="jump-check" type="checkbox" data-jump-key="${escapeHtml(key)}" aria-label="도약지원 해당" ${isCheckedValue(value(row, ["도약지원"])) ? "checked" : ""}>`;
-        const etcCheck = `<input class="etc-check" type="checkbox" data-etc-key="${escapeHtml(key)}" aria-label="기타 해당" ${isCheckedValue(value(row, ["기타"])) ? "checked" : ""}>`;
+        const etcCheck = `<input class="etc-check" type="checkbox" data-etc-key="${escapeHtml(key)}" aria-label="LH 해당" ${isCheckedValue(value(row, ["기타"])) ? "checked" : ""}>`;
         const companyName = value(row, ["기업명"]);
         const memo = memoOverrides[key] || "";
         const companyCell = row._historyRow
