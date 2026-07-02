@@ -364,7 +364,7 @@
 
     .stats-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
       gap: 14px;
       align-items: start;
       min-width: 0;
@@ -410,7 +410,7 @@
     .stats-table th,
     .stats-table td {
       border: 1px solid #c9d2cb;
-      padding: 7px 9px;
+      padding: 6px 7px;
       text-align: center;
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
@@ -437,6 +437,18 @@
     .stats-table .total-row td {
       font-weight: 900;
       background: #f8fbfd;
+    }
+
+    .owner-stats-panel .stats-table {
+      min-width: 520px;
+    }
+
+    .owner-stats-panel .stats-table th,
+    .owner-stats-panel .stats-table td {
+      overflow: visible;
+      text-overflow: clip;
+      padding-left: 10px;
+      padding-right: 10px;
     }
 
     .stats-note {
@@ -1003,7 +1015,7 @@
             <table class="stats-table" id="gradeStats"></table>
           </div>
         </div>
-        <div class="stats-panel">
+        <div class="stats-panel owner-stats-panel">
           <h3 class="stats-title">담당자별 누적</h3>
           <div class="stats-scroll">
             <table class="stats-table" id="ownerStats"></table>
