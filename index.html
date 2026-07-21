@@ -274,6 +274,33 @@
       gap: 10px;
     }
 
+    .view-switch {
+      display: inline-flex;
+      width: fit-content;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .view-btn {
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      height: 32px;
+      padding: 0 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .view-btn.active {
+      background: var(--green);
+      color: #fff;
+    }
+
     .round-filter {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -506,6 +533,51 @@
       border-collapse: collapse;
       min-width: 1860px;
       font-size: 13px;
+    }
+
+    .coaching-dashboard table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      font-size: 13px;
+    }
+
+    .coaching-dashboard th,
+    .coaching-dashboard td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .coaching-dashboard th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f9fbf8;
+      color: #48534d;
+      font-size: 12px;
+    }
+
+    .coaching-dashboard tbody tr:hover td {
+      background: #e4f3ea;
+    }
+
+    .coaching-date {
+      width: 128px;
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 5px 7px;
+      color: var(--ink);
+    }
+
+    .coaching-status-check {
+      inline-size: 18px;
+      block-size: 18px;
+      accent-color: var(--green);
+      cursor: pointer;
     }
 
     .table-wrap th,
@@ -809,6 +881,50 @@
       white-space: nowrap;
     }
 
+    .table-wrap.coaching-dashboard table {
+      min-width: 820px;
+    }
+
+    .table-wrap.coaching-dashboard th,
+    .table-wrap.coaching-dashboard td {
+      width: auto;
+      min-width: 0;
+      max-width: none;
+      padding: 10px 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .table-wrap.coaching-dashboard th:nth-child(5),
+    .table-wrap.coaching-dashboard td:nth-child(5),
+    .table-wrap.coaching-dashboard th:nth-child(6),
+    .table-wrap.coaching-dashboard td:nth-child(6) {
+      width: 86px;
+      min-width: 86px;
+      max-width: 86px;
+      text-align: center;
+    }
+
+    .table-wrap.coaching-dashboard th:nth-child(7),
+    .table-wrap.coaching-dashboard td:nth-child(7) {
+      width: 64px;
+      min-width: 64px;
+      max-width: 64px;
+      text-align: center;
+    }
+
+    .btn.compact-icon {
+      height: 30px;
+      width: 30px;
+      padding: 0;
+      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 800;
+      color: #466257;
+      background: #fbfcfa;
+    }
+
     .empty {
       padding: 32px 14px;
       color: var(--muted);
@@ -951,98 +1067,134 @@
             <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M18 3v5h5"/></svg></span>
             SVI 모의진단
           </a>
+          <button class="btn" id="exportXlsxBtn" type="button">엑셀 다운로드</button>
           <button class="btn" id="statsBtn" type="button">통계</button>
           <button class="btn primary" id="csvBtn" type="button">추가</button>
         </div>
       </section>
 
-      <section class="round-filter" aria-label="차수 필터">
-        <div class="round-filter-label">차수</div>
-        <div class="rounds" id="roundButtons"></div>
+      <nav class="view-switch" aria-label="화면 전환">
+        <button class="view-btn active" data-view="intake" type="button">접수 현황</button>
+        <button class="view-btn" data-view="coaching" type="button">심화코칭 현황</button>
+      </nav>
+
+      <section id="intakeView">
+        <section class="round-filter" aria-label="차수 필터">
+          <div class="round-filter-label">차수</div>
+          <div class="rounds" id="roundButtons"></div>
+        </section>
+
+        <section class="toolbar" aria-label="필터">
+          <div class="field">
+            <label for="searchInput">검색</label>
+            <input id="searchInput" type="search" placeholder="기업명, 지역, 담당자, 측정자 · 쉼표로 여러 개 검색">
+          </div>
+          <div class="field">
+            <label for="statusFilter">상태</label>
+            <select id="statusFilter">
+              <option value="all">전체</option>
+              <option value="overdue">마감지연</option>
+              <option value="dueSoon">보완임박</option>
+              <option value="supplement">보완진행</option>
+              <option value="supplementDone">보완완료</option>
+              <option value="done">검토완료</option>
+              <option value="received">접수</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="regionFilter">지역</label>
+            <select id="regionFilter"><option value="all">전체</option></select>
+          </div>
+          <div class="field">
+            <label for="ownerFilter">담당자</label>
+            <select id="ownerFilter"><option value="all">전체</option></select>
+          </div>
+          <div class="field">
+            <label for="sortSelect">정렬</label>
+            <select id="sortSelect">
+              <option value="applyDesc">신청일 최신순</option>
+              <option value="applyAsc" selected>신청일 오래된순</option>
+              <option value="dueAsc">보완마감 빠른순</option>
+              <option value="companyAsc">기업명 가나다순</option>
+              <option value="scoreDesc">점수 높은순</option>
+              <option value="coachingOnly">심화코칭</option>
+              <option value="jumpOnly">도약지원</option>
+              <option value="etcOnly">LH</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="cards" aria-label="핵심 지표">
+          <button class="metric" data-metric-status="all" type="button"><span>총 기업</span><strong id="metricTotal">0</strong></button>
+          <button class="metric" data-metric-status="done" type="button"><span>검토완료</span><strong id="metricDone">0</strong></button>
+          <button class="metric" data-metric-status="supplement" type="button"><span>보완진행</span><strong id="metricSupplement">0</strong></button>
+          <button class="metric" data-metric-status="dueSoon" type="button"><span>보완임박</span><strong id="metricDueSoon">0</strong></button>
+          <button class="metric" data-metric-status="supplementDone" type="button"><span>보완완료</span><strong id="metricSupplementDone">0</strong></button>
+        </section>
+
+        <section class="content-grid">
+          <div class="table-wrap">
+            <div class="table-head">
+              <h3>기업 목록</h3>
+              <div class="source-state" id="sourceState">준비 중</div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>상태</th>
+                    <th>차수</th>
+                    <th>기업명</th>
+                    <th>신청일</th>
+                    <th>담당자</th>
+                    <th>보완요청일</th>
+                    <th>보완마감일</th>
+                    <th>보완완료일</th>
+                    <th>지역</th>
+                    <th>대표자명</th>
+                    <th>주 업종</th>
+                    <th>연락처</th>
+                    <th>이메일</th>
+                    <th>검토완료일</th>
+                    <th>측정자</th>
+                    <th>측정자소속</th>
+                    <th>등급</th>
+                    <th>점수</th>
+                    <th>심화코칭</th>
+                    <th>도약지원</th>
+                    <th>LH</th>
+                  </tr>
+                </thead>
+                <tbody id="companyRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </section>
 
-      <section class="toolbar" aria-label="필터">
-        <div class="field">
-          <label for="searchInput">검색</label>
-          <input id="searchInput" type="search" placeholder="기업명, 지역, 담당자, 측정자 · 쉼표로 여러 개 검색">
-        </div>
-        <div class="field">
-          <label for="statusFilter">상태</label>
-          <select id="statusFilter">
-            <option value="all">전체</option>
-            <option value="overdue">마감지연</option>
-            <option value="dueSoon">보완임박</option>
-            <option value="supplement">보완진행</option>
-            <option value="supplementDone">보완완료</option>
-            <option value="done">검토완료</option>
-            <option value="received">접수</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="regionFilter">지역</label>
-          <select id="regionFilter"><option value="all">전체</option></select>
-        </div>
-        <div class="field">
-          <label for="ownerFilter">담당자</label>
-          <select id="ownerFilter"><option value="all">전체</option></select>
-        </div>
-        <div class="field">
-          <label for="sortSelect">정렬</label>
-          <select id="sortSelect">
-            <option value="applyDesc">신청일 최신순</option>
-            <option value="applyAsc" selected>신청일 오래된순</option>
-            <option value="dueAsc">보완마감 빠른순</option>
-            <option value="companyAsc">기업명 가나다순</option>
-            <option value="scoreDesc">점수 높은순</option>
-            <option value="coachingOnly">심화코칭</option>
-            <option value="jumpOnly">도약지원</option>
-            <option value="etcOnly">LH</option>
-          </select>
-        </div>
-      </section>
-
-      <section class="cards" aria-label="핵심 지표">
-        <button class="metric" data-metric-status="all" type="button"><span>총 기업</span><strong id="metricTotal">0</strong></button>
-        <button class="metric" data-metric-status="done" type="button"><span>검토완료</span><strong id="metricDone">0</strong></button>
-        <button class="metric" data-metric-status="supplement" type="button"><span>보완진행</span><strong id="metricSupplement">0</strong></button>
-        <button class="metric" data-metric-status="dueSoon" type="button"><span>보완임박</span><strong id="metricDueSoon">0</strong></button>
-        <button class="metric" data-metric-status="supplementDone" type="button"><span>보완완료</span><strong id="metricSupplementDone">0</strong></button>
-      </section>
-
-      <section class="content-grid">
-        <div class="table-wrap">
+      <section class="content-grid hidden" id="coachingView">
+        <div class="table-wrap coaching-dashboard">
           <div class="table-head">
-            <h3>기업 목록</h3>
-            <div class="source-state" id="sourceState">준비 중</div>
+            <h3>심화코칭 현황</h3>
+            <div class="actions">
+              <div class="source-state" id="coachingState">심화코칭 체크 기업 기준</div>
+              <button class="btn compact-icon" id="addCoachingBtn" type="button" aria-label="심화코칭 기업 추가" title="추가">+</button>
+            </div>
           </div>
           <div class="table-scroll">
             <table>
               <thead>
                 <tr>
-                  <th>상태</th>
-                  <th>차수</th>
-                  <th>기업명</th>
-                  <th>신청일</th>
+                  <th>심화코칭 신청기업</th>
                   <th>담당자</th>
-                  <th>보완요청일</th>
-                  <th>보완마감일</th>
-                  <th>보완완료일</th>
-                  <th>지역</th>
-                  <th>대표자명</th>
-                  <th>주 업종</th>
-                  <th>연락처</th>
-                  <th>이메일</th>
-                  <th>검토완료일</th>
-                  <th>측정자</th>
-                  <th>측정자소속</th>
-                  <th>등급</th>
-                  <th>점수</th>
-                  <th>심화코칭</th>
-                  <th>도약지원</th>
-                  <th>LH</th>
+                  <th>1차 날짜</th>
+                  <th>2차 날짜</th>
+                  <th>신청서 제출</th>
+                  <th>보고서 제출</th>
+                  <th>관리</th>
                 </tr>
               </thead>
-              <tbody id="companyRows"></tbody>
+              <tbody id="coachingRows"></tbody>
             </table>
           </div>
         </div>
@@ -1074,6 +1226,28 @@
       <div class="actions">
         <button class="btn" id="chooseHistoryFile" type="button">과거 DB 선택</button>
         <button class="btn" id="loadHistoryText" type="button">붙여넣은 내용 과거 DB 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="coachingModal" role="dialog" aria-modal="true" aria-labelledby="coachingModalTitle">
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h3 id="coachingModalTitle">심화코칭 기업 추가</h3>
+        <button class="btn" id="closeCoachingModal" type="button">닫기</button>
+      </div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="coachingCompanyInput">기업명</label>
+          <input id="coachingCompanyInput" type="text" placeholder="기업명 입력">
+        </div>
+        <div class="field">
+          <label for="coachingOwnerInput">담당자</label>
+          <input id="coachingOwnerInput" type="text" placeholder="담당자 입력">
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="saveCoachingItem" type="button">추가</button>
       </div>
     </div>
   </div>
@@ -1116,8 +1290,10 @@
 
   <script src="history-data.js"></script>
   <script src="current-owner-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1qNWCt306t_ChoGoGQyKcDeUnDvlKvvAazMyP89nM-Zw/export?format=csv&gid=1101761887";
+    const COACHING_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1qNWCt306t_ChoGoGQyKcDeUnDvlKvvAazMyP89nM-Zw/export?format=csv&gid=1199186759";
     const SUPABASE_URL = "https://lczjecktxbqkpdyayhmy.supabase.co";
     const SUPABASE_KEY = "sb_publishable_S4r1JQIyJ8sFA5phKw8tyg_r49FtQvd";
     const SUPABASE_TABLE = "svi_companies";
@@ -1129,6 +1305,9 @@
     const JUMP_OVERRIDES_KEY = "svi_dongnam_jump_overrides_v1";
     const ETC_OVERRIDES_KEY = "svi_dongnam_etc_overrides_v1";
     const MEMO_OVERRIDES_KEY = "svi_dongnam_memo_overrides_v1";
+    const COACHING_STATUS_KEY = "svi_dongnam_coaching_status_v1";
+    const COACHING_MANUAL_KEY = "svi_dongnam_coaching_manual_v1";
+    const COACHING_DELETED_KEY = "svi_dongnam_coaching_deleted_v1";
     const HISTORY_KEY = "svi_dongnam_owner_history_v1";
     const AUTH_KEY = "svi_dongnam_auth_v1";
     const ACCESS_PASSWORD = "1127";
@@ -1178,6 +1357,9 @@
     let cloudReady = false;
     let cloudSaveTimer = null;
     let openMemoKey = "";
+    let activeView = "intake";
+    let coachingSheetRows = [];
+    let coachingSheetLoaded = false;
 
     const $ = (id) => document.getElementById(id);
 
@@ -1233,6 +1415,50 @@
         });
         return normalizeRecord(record);
       }).filter((record) => record["기업명"]);
+    }
+
+    function parseGenericCsv(text) {
+      const delimiter = detectDelimiter(text);
+      const table = [];
+      let row = [];
+      let cell = "";
+      let quoted = false;
+
+      for (let i = 0; i < text.length; i += 1) {
+        const ch = text[i];
+        const next = text[i + 1];
+        if (ch === '"' && quoted && next === '"') {
+          cell += '"';
+          i += 1;
+        } else if (ch === '"') {
+          quoted = !quoted;
+        } else if (ch === delimiter && !quoted) {
+          row.push(cell);
+          cell = "";
+        } else if ((ch === "\n" || ch === "\r") && !quoted) {
+          if (ch === "\r" && next === "\n") i += 1;
+          row.push(cell);
+          if (row.some((item) => item.trim() !== "")) table.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += ch;
+        }
+      }
+      row.push(cell);
+      if (row.some((item) => item.trim() !== "")) table.push(row);
+      if (!table.length) return [];
+
+      const headerIndex = table.findIndex((line) => line.some((item) => normalizeHeader(item)));
+      if (headerIndex < 0) return [];
+      const headers = table[headerIndex].map(normalizeHeader);
+      return table.slice(headerIndex + 1).map((line) => {
+        const record = {};
+        headers.forEach((header, index) => {
+          if (header) record[header] = normalizeHeader(line[index]);
+        });
+        return record;
+      }).filter((record) => Object.values(record).some(Boolean));
     }
 
     function parseHtmlTable(text) {
@@ -1408,6 +1634,35 @@
         if (row[key]) return row[key];
       }
       return "";
+    }
+
+    function firstGenericValue(row, keys) {
+      const normalizedMap = {};
+      Object.entries(row || {}).forEach(([key, val]) => {
+        normalizedMap[normalizeHeader(key).replace(/\s+/g, "")] = val;
+      });
+      for (const key of keys) {
+        if (row?.[key]) return row[key];
+        const normalized = normalizeHeader(key).replace(/\s+/g, "");
+        if (normalizedMap[normalized]) return normalizedMap[normalized];
+      }
+      return "";
+    }
+
+    function normalizeCoachingSheetRows(list) {
+      return list.map((row) => {
+        const company = firstGenericValue(row, ["심화코칭 신청기업", "신청기업", "기업명", "회사명", "기관명"]);
+        if (!company) return null;
+        return {
+          company,
+          owner: firstGenericValue(row, ["담당자", "서류검토 담당자", "검토 담당자"]),
+          firstDate: firstGenericValue(row, ["1차 날짜", "1차날짜", "1차", "1차 상담일", "1차 코칭일", "1차일"]),
+          secondDate: firstGenericValue(row, ["2차 날짜", "2차날짜", "2차", "2차 상담일", "2차 코칭일", "2차일"]),
+          applicationSubmitted: firstGenericValue(row, ["신청서 제출여부", "신청서 제출 여부", "신청서", "신청서 제출"]),
+          reportSubmitted: firstGenericValue(row, ["보고서 제출 여부", "보고서 제출여부", "보고서", "보고서 제출"]),
+          finalConfirmed: firstGenericValue(row, ["최종확인", "최종 확인", "최종"])
+        };
+      }).filter(Boolean);
     }
 
     function normalizeRound(row) {
@@ -1610,6 +1865,42 @@
 
     function saveMemoOverrides(overrides) {
       localStorage.setItem(MEMO_OVERRIDES_KEY, JSON.stringify(overrides));
+    }
+
+    function loadCoachingStatus() {
+      try {
+        return JSON.parse(localStorage.getItem(COACHING_STATUS_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveCoachingStatus(status) {
+      localStorage.setItem(COACHING_STATUS_KEY, JSON.stringify(status));
+    }
+
+    function loadManualCoachingRows() {
+      try {
+        return JSON.parse(localStorage.getItem(COACHING_MANUAL_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveManualCoachingRows(list) {
+      localStorage.setItem(COACHING_MANUAL_KEY, JSON.stringify(list));
+    }
+
+    function loadDeletedCoachingKeys() {
+      try {
+        return JSON.parse(localStorage.getItem(COACHING_DELETED_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveDeletedCoachingKeys(list) {
+      localStorage.setItem(COACHING_DELETED_KEY, JSON.stringify([...new Set(list.filter(Boolean))]));
     }
 
     function normalizeCompanyName(name) {
@@ -1878,6 +2169,9 @@
         jumpOverrides: loadJumpOverrides(),
         etcOverrides: loadEtcOverrides(),
         memoOverrides: loadMemoOverrides(),
+        coachingStatus: loadCoachingStatus(),
+        manualCoachingRows: loadManualCoachingRows(),
+        deletedCoachingKeys: loadDeletedCoachingKeys(),
         history: loadStoredJson(HISTORY_KEY, {}),
         updatedAt: new Date().toISOString()
       };
@@ -1916,6 +2210,9 @@
       if (state.jumpOverrides) localStorage.setItem(JUMP_OVERRIDES_KEY, JSON.stringify(state.jumpOverrides));
       if (state.etcOverrides) localStorage.setItem(ETC_OVERRIDES_KEY, JSON.stringify(state.etcOverrides));
       if (state.memoOverrides) localStorage.setItem(MEMO_OVERRIDES_KEY, JSON.stringify(state.memoOverrides));
+      if (state.coachingStatus) localStorage.setItem(COACHING_STATUS_KEY, JSON.stringify(state.coachingStatus));
+      if (state.manualCoachingRows) localStorage.setItem(COACHING_MANUAL_KEY, JSON.stringify(state.manualCoachingRows));
+      if (state.deletedCoachingKeys) localStorage.setItem(COACHING_DELETED_KEY, JSON.stringify(state.deletedCoachingKeys));
       if (state.history) localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history));
       rows = applyAllOverrides(state.rows);
       return true;
@@ -2195,6 +2492,169 @@
       renderOwnerStats(list);
     }
 
+    function yesNo(valueText) {
+      return isCheckedValue(valueText) ? "Y" : "";
+    }
+
+    function exportCurrentRows() {
+      const memoOverrides = loadMemoOverrides();
+      return rows.filter((row) => !row._historyRow).map((row) => {
+        const key = recordKey(row);
+        return {
+          "상태": statusOf(row).label,
+          "차수": getRound(row),
+          "기업명": value(row, ["기업명"]),
+          "신청일": value(row, ["신청일자"]),
+          "담당자": currentOwnerValue(row) || "미지정",
+          "담당자 자동추천": row._ownerSuggested ? "Y" : "",
+          "보완요청일": value(row, ["보완요청일"]),
+          "보완마감일": value(row, ["보완마감일"]),
+          "보완완료일": value(row, ["보완완료일"]),
+          "지역": value(row, ["지역"]),
+          "대표자명": value(row, ["대표자명"]),
+          "주 업종": value(row, ["주 업종"]),
+          "연락처": value(row, ["연락처"]),
+          "이메일": value(row, ["이메일"]),
+          "검토완료일": value(row, ["서류검토완료일", "검토완료일"]),
+          "측정자": value(row, ["측정자"]),
+          "측정자소속": value(row, ["측정자소속"]),
+          "등급": value(row, ["등급"]),
+          "점수": formatScore(value(row, ["점수"])),
+          "심화코칭": yesNo(value(row, ["심화코칭"])),
+          "도약지원": yesNo(value(row, ["도약지원"])),
+          "LH": yesNo(value(row, ["기타"])),
+          "메모": memoOverrides[key] || ""
+        };
+      });
+    }
+
+    function exportHistoryRows() {
+      const seen = new Set();
+      return Object.values(loadHistory()).flat().filter((record) => {
+        const key = [
+          record.company,
+          record.owner,
+          record.year,
+          record.round,
+          record.date,
+          record.score
+        ].join("|");
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }).sort((a, b) =>
+        String(b.year || "").localeCompare(String(a.year || "")) ||
+        String(a.company || "").localeCompare(String(b.company || ""), "ko")
+      ).map((record) => ({
+        "연도": record.year || "",
+        "차수": record.round || "",
+        "기업명": record.company || "",
+        "신청일": record.date || "",
+        "담당자": record.owner || "",
+        "지역": record.region || "",
+        "대표자명": record.representative || "",
+        "주 업종": record.industry || "",
+        "연락처": record.phone || "",
+        "이메일": record.email || "",
+        "측정자": record.assessor || "",
+        "측정자소속": record.assessorOrg || "",
+        "등급": record.grade || "",
+        "점수": formatScore(record.score || "")
+      }));
+    }
+
+    function exportCoachingRows() {
+      const statusMap = loadCoachingStatus();
+      return coachingDashboardRows().map((row) => {
+        const item = { ...row, ...(statusMap[row.key] || {}) };
+        return {
+          "심화코칭 신청기업": item.company || "",
+          "담당자": item.owner || "미지정",
+          "1차 날짜": item.firstDate || "",
+          "2차 날짜": item.secondDate || "",
+          "신청서 제출": item.applicationSubmitted ? "Y" : "",
+          "보고서 제출": item.reportSubmitted ? "Y" : ""
+        };
+      });
+    }
+
+    function exportRegionRoundStats(list) {
+      const baseRegions = ["대구", "경북", "부산", "울산", "경남"];
+      const extraRegions = uniqueValues(["지역"]).filter((region) => !baseRegions.includes(region));
+      const regions = [...baseRegions, ...extraRegions];
+      const rounds = ["1", "2", "3"];
+      const data = rounds.map((round) => {
+        const row = { "차수": `${round}차` };
+        regions.forEach((region) => row[region] = countWhere(list, (item) => getRound(item) === round && value(item, ["지역"]) === region));
+        row["계"] = regions.reduce((total, region) => total + row[region], 0);
+        return row;
+      });
+      const totalRow = { "차수": "계" };
+      regions.forEach((region) => totalRow[region] = countWhere(list, (item) => value(item, ["지역"]) === region));
+      totalRow["계"] = regions.reduce((total, region) => total + totalRow[region], 0);
+      return [...data, totalRow];
+    }
+
+    function exportRoundStats(list) {
+      const rounds = ["1", "2", "3"];
+      const row = {};
+      rounds.forEach((round) => row[`${round}차`] = countWhere(list, (item) => getRound(item) === round));
+      row["계"] = rounds.reduce((total, round) => total + row[`${round}차`], 0);
+      return [row];
+    }
+
+    function exportGradeStats(list) {
+      const rounds = ["1", "2", "3"];
+      const grades = ["탁월", "우수", "양호", "미흡", "취약"];
+      const data = rounds.map((round) => {
+        const row = { "차수": `${round}차` };
+        grades.forEach((grade) => row[grade] = countWhere(list, (item) => getRound(item) === round && normalizeGrade(item) === grade));
+        row["계"] = grades.reduce((total, grade) => total + row[grade], 0);
+        return row;
+      });
+      const totalRow = { "차수": "계" };
+      grades.forEach((grade) => totalRow[grade] = countWhere(list, (item) => normalizeGrade(item) === grade));
+      totalRow["계"] = grades.reduce((total, grade) => total + totalRow[grade], 0);
+      return [...data, totalRow];
+    }
+
+    function exportOwnerStats(list) {
+      const row = {};
+      CURRENT_OWNERS.forEach((owner) => row[owner] = countWhere(list, (item) => currentOwnerValue(item) === owner));
+      row["미지정"] = countWhere(list, (item) => !currentOwnerValue(item));
+      row["계"] = list.length;
+      return [row];
+    }
+
+    function appendJsonSheet(workbook, name, data) {
+      const rowsForSheet = data.length ? data : [{ "내용": "데이터 없음" }];
+      const sheet = XLSX.utils.json_to_sheet(rowsForSheet);
+      const headers = Object.keys(rowsForSheet[0] || {});
+      sheet["!cols"] = headers.map((header) => {
+        const maxCell = rowsForSheet.reduce((max, row) => Math.max(max, String(row[header] || "").length), String(header).length);
+        return { wch: Math.min(Math.max(maxCell + 2, 8), 28) };
+      });
+      XLSX.utils.book_append_sheet(workbook, sheet, name.slice(0, 31));
+    }
+
+    function downloadXlsx() {
+      if (!window.XLSX) {
+        window.alert("엑셀 생성 라이브러리를 불러오지 못했습니다. 인터넷 연결 후 다시 시도해주세요.");
+        return;
+      }
+      const workbook = XLSX.utils.book_new();
+      const currentRows = rows.filter((row) => !row._historyRow);
+      appendJsonSheet(workbook, "접수현황", exportCurrentRows());
+      appendJsonSheet(workbook, "심화코칭현황", exportCoachingRows());
+      appendJsonSheet(workbook, "과거DB", exportHistoryRows());
+      appendJsonSheet(workbook, "지역차수", exportRegionRoundStats(currentRows));
+      appendJsonSheet(workbook, "차수별접수", exportRoundStats(currentRows));
+      appendJsonSheet(workbook, "평가결과", exportGradeStats(currentRows));
+      appendJsonSheet(workbook, "담당자누적", exportOwnerStats(currentRows));
+      const stamp = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(workbook, `SVI_동남권_서류검토_현황_${stamp}.xlsx`);
+    }
+
     function renderTable(list) {
       const body = $("companyRows");
       if (!list.length) {
@@ -2268,10 +2728,110 @@
       }).join("");
     }
 
+    function findCurrentRowByCompany(company) {
+      const target = normalizeCompanyName(company);
+      if (!target) return null;
+      return rows.find((row) => normalizeCompanyName(value(row, ["기업명"])) === target) || null;
+    }
+
+    function coachingDashboardRows() {
+      const seen = new Set();
+      const deleted = new Set(loadDeletedCoachingKeys());
+      const remember = (item) => {
+        const key = normalizeCompanyName(item.company);
+        if (deleted.has(key)) return false;
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      };
+      const manualRows = loadManualCoachingRows().map((item) => {
+        const matched = findCurrentRowByCompany(item.company);
+        return {
+          key: item.key || (matched ? recordKey(matched) : `coaching:${normalizeCompanyName(item.company)}`),
+          company: item.company || "",
+          owner: item.owner || (matched ? currentOwnerValue(matched) || value(matched, ["서류검토 담당자"]) : "") || "미지정",
+            firstDate: "",
+            secondDate: "",
+            applicationSubmitted: false,
+            reportSubmitted: false,
+            _manual: true
+          };
+      });
+      if (coachingSheetRows.length) {
+        return [...coachingSheetRows.map((item) => {
+          const matched = findCurrentRowByCompany(item.company);
+          return {
+            key: matched ? recordKey(matched) : `coaching:${normalizeCompanyName(item.company)}`,
+            company: item.company,
+            owner: item.owner || (matched ? currentOwnerValue(matched) || value(matched, ["서류검토 담당자"]) : "") || "미지정",
+            firstDate: item.firstDate || "",
+            secondDate: item.secondDate || "",
+            applicationSubmitted: isCheckedValue(item.applicationSubmitted),
+            reportSubmitted: isCheckedValue(item.reportSubmitted)
+          };
+        }), ...manualRows].filter(remember).sort((a, b) => String(a.company).localeCompare(String(b.company), "ko"));
+      }
+      return [...rows
+        .filter((row) => !row._historyRow && isCheckedValue(value(row, ["심화코칭"])))
+        .sort((a, b) => {
+          const ad = asDate(value(a, ["신청일자"])) || new Date(0);
+          const bd = asDate(value(b, ["신청일자"])) || new Date(0);
+          return ad - bd;
+        })
+        .map((row) => ({
+          key: recordKey(row),
+          company: value(row, ["기업명"]),
+          owner: currentOwnerValue(row) || value(row, ["서류검토 담당자"]) || "미지정",
+          firstDate: "",
+          secondDate: "",
+          applicationSubmitted: false,
+          reportSubmitted: false
+        })), ...manualRows].filter(remember);
+    }
+
+    function renderCoachingDashboard() {
+      const body = $("coachingRows");
+      const list = coachingDashboardRows();
+      const statusMap = loadCoachingStatus();
+      const manualCount = loadManualCoachingRows().length;
+      $("coachingState").textContent = coachingSheetLoaded
+        ? `구글시트 연동 · ${list.length}건${manualCount ? ` · 직접추가 ${manualCount}건` : ""}`
+        : `심화코칭 체크 기업 · ${list.length}건${manualCount ? ` · 직접추가 ${manualCount}건` : ""}`;
+      if (!list.length) {
+        body.innerHTML = '<tr><td colspan="7" class="empty">심화코칭 현황 데이터가 없습니다.</td></tr>';
+        return;
+      }
+      body.innerHTML = list.map((row) => {
+        const key = row.key;
+        const item = { ...row, ...(statusMap[key] || {}) };
+        const companyKey = normalizeCompanyName(row.company);
+        const deleteCell = `<button class="btn compact-icon" data-coaching-delete="${escapeHtml(key)}" data-coaching-company="${escapeHtml(companyKey)}" type="button" aria-label="${escapeHtml(row.company)} 삭제" title="삭제">-</button>`;
+        return `
+          <tr>
+            <td>${escapeHtml(row.company)}</td>
+            <td>${escapeHtml(row.owner || "미지정")}</td>
+            <td><input class="coaching-date" data-coaching-status-key="${escapeHtml(key)}" data-coaching-status-field="firstDate" type="text" inputmode="numeric" placeholder="2026-01-01" value="${escapeHtml(item.firstDate || "")}"></td>
+            <td><input class="coaching-date" data-coaching-status-key="${escapeHtml(key)}" data-coaching-status-field="secondDate" type="text" inputmode="numeric" placeholder="2026-01-01" value="${escapeHtml(item.secondDate || "")}"></td>
+            <td><input class="coaching-status-check" data-coaching-status-key="${escapeHtml(key)}" data-coaching-status-field="applicationSubmitted" type="checkbox" aria-label="신청서 제출" ${item.applicationSubmitted ? "checked" : ""}></td>
+            <td><input class="coaching-status-check" data-coaching-status-key="${escapeHtml(key)}" data-coaching-status-field="reportSubmitted" type="checkbox" aria-label="보고서 제출" ${item.reportSubmitted ? "checked" : ""}></td>
+            <td>${deleteCell}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
     function renderSubtitle() {
       const label = activeRound === "all" ? "전체 차수" : `${activeRound}차`;
       const doneOne = rows.filter((row) => getRound(row) === "1").every((row) => statusOf(row).key === "done");
       $("subtitle").textContent = `${label} 기준 · 1차 ${doneOne && rows.some((row) => getRound(row) === "1") ? "검토 완료" : "진행 현황 포함"}`;
+    }
+
+    function renderView() {
+      $("intakeView").classList.toggle("hidden", activeView !== "intake");
+      $("coachingView").classList.toggle("hidden", activeView !== "coaching");
+      document.querySelectorAll(".view-btn").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === activeView);
+      });
     }
 
     function render() {
@@ -2283,7 +2843,9 @@
       renderMetrics(metricBaseRows());
       renderStats(currentList);
       renderTable(list);
+      renderCoachingDashboard();
       renderSubtitle();
+      renderView();
     }
 
     function setOwnerOverride(key, owner) {
@@ -2336,6 +2898,88 @@
       saveLocal();
     }
 
+    function setCoachingStatusField(key, field, value) {
+      const status = loadCoachingStatus();
+      const item = { ...(status[key] || {}) };
+      if (field === "applicationSubmitted" || field === "reportSubmitted") {
+        item[field] = Boolean(value);
+      } else {
+        item[field] = String(value || "").trim();
+      }
+      const hasValue = Object.values(item).some((entry) => entry === true || String(entry || "").trim());
+      if (hasValue) status[key] = item;
+      else delete status[key];
+      saveCoachingStatus(status);
+      saveLocal();
+    }
+
+    function deleteCoachingRow(key, companyKey) {
+      const manualRows = loadManualCoachingRows();
+      const visibleRows = coachingDashboardRows();
+      const target = visibleRows.find((item) => item.key === key) || manualRows.find((item) => item.key === key);
+      const normalizedCompany = companyKey || normalizeCompanyName(target?.company);
+      if (!target && !normalizedCompany) return;
+      if (!window.confirm(`${target?.company || "선택한"} 항목을 삭제할까요?`)) return;
+      saveManualCoachingRows(manualRows.filter((item) => item.key !== key));
+      if (normalizedCompany) saveDeletedCoachingKeys([...loadDeletedCoachingKeys(), normalizedCompany]);
+      const matched = target?.company ? findCurrentRowByCompany(target.company) : null;
+      if (matched) {
+        const matchedKey = recordKey(matched);
+        const overrides = loadCoachingOverrides();
+        overrides[matchedKey] = false;
+        saveCoachingOverrides(overrides);
+        rows = rows.map((row) => recordKey(row) === matchedKey ? { ...row, "심화코칭": "" } : row);
+      }
+      const status = loadCoachingStatus();
+      delete status[key];
+      saveCoachingStatus(status);
+      saveLocal();
+      renderCoachingDashboard();
+    }
+
+    function openCoachingModal() {
+      $("coachingCompanyInput").value = "";
+      $("coachingOwnerInput").value = "";
+      $("coachingModal").classList.add("open");
+      $("coachingCompanyInput").focus();
+    }
+
+    function addManualCoachingRow() {
+      const company = $("coachingCompanyInput").value.trim();
+      const owner = $("coachingOwnerInput").value.trim();
+      if (!company) {
+        window.alert("기업명을 입력해주세요.");
+        $("coachingCompanyInput").focus();
+        return;
+      }
+      const companyKey = normalizeCompanyName(company);
+      const deletedKeys = loadDeletedCoachingKeys();
+      if (deletedKeys.includes(companyKey)) {
+        saveDeletedCoachingKeys(deletedKeys.filter((item) => item !== companyKey));
+        $("coachingModal").classList.remove("open");
+        saveLocal();
+        renderCoachingDashboard();
+        return;
+      }
+      const exists = coachingDashboardRows().some((row) => normalizeCompanyName(row.company) === companyKey);
+      if (exists) {
+        window.alert("이미 심화코칭 현황에 있는 기업입니다.");
+        return;
+      }
+      const matched = findCurrentRowByCompany(company);
+      const manualRows = loadManualCoachingRows();
+      manualRows.push({
+        key: matched ? recordKey(matched) : `coaching-manual:${Date.now()}:${companyKey}`,
+        company,
+        owner,
+        createdAt: new Date().toISOString()
+      });
+      saveManualCoachingRows(manualRows);
+      $("coachingModal").classList.remove("open");
+      saveLocal();
+      renderCoachingDashboard();
+    }
+
     async function loadSheet() {
       setSourceState("시트 연결 중");
       try {
@@ -2357,6 +3001,23 @@
         rows = applyAllOverrides(local.length ? local : sampleRows);
         setSourceState(local.length ? `브라우저 저장 데이터 · ${rows.length}건` : "예시 데이터 표시 중");
         render();
+      }
+    }
+
+    async function loadCoachingSheet() {
+      try {
+        const response = await fetch(COACHING_SHEET_CSV_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error("coaching-sheet");
+        const text = await response.text();
+        const parsed = normalizeCoachingSheetRows(parseGenericCsv(text));
+        if (!parsed.length) throw new Error("coaching-empty");
+        coachingSheetRows = parsed;
+        coachingSheetLoaded = true;
+        renderCoachingDashboard();
+      } catch {
+        coachingSheetRows = [];
+        coachingSheetLoaded = false;
+        renderCoachingDashboard();
       }
     }
 
@@ -2459,13 +3120,29 @@
         render();
       });
     });
+    document.querySelectorAll(".view-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeView = button.dataset.view;
+        renderView();
+      });
+    });
 
     $("csvBtn").addEventListener("click", openImportModal);
+    $("exportXlsxBtn").addEventListener("click", downloadXlsx);
+    $("addCoachingBtn").addEventListener("click", openCoachingModal);
+    $("saveCoachingItem").addEventListener("click", addManualCoachingRow);
+    $("coachingCompanyInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") addManualCoachingRow();
+    });
     $("closeCsv").addEventListener("click", () => $("csvModal").classList.remove("open"));
+    $("closeCoachingModal").addEventListener("click", () => $("coachingModal").classList.remove("open"));
     $("statsBtn").addEventListener("click", () => $("statsModal").classList.add("open"));
     $("closeStats").addEventListener("click", () => $("statsModal").classList.remove("open"));
     $("statsModal").addEventListener("click", (event) => {
       if (!event.target.closest(".modal-panel")) $("statsModal").classList.remove("open");
+    });
+    $("coachingModal").addEventListener("click", (event) => {
+      if (!event.target.closest(".modal-panel")) $("coachingModal").classList.remove("open");
     });
     $("chooseFile").addEventListener("click", () => $("fileInput").click());
     $("chooseHistoryFile").addEventListener("click", () => $("historyFileInput").click());
@@ -2492,6 +3169,22 @@
       if (event.target.matches("textarea[data-memo-key]")) {
         setMemoOverride(event.target.dataset.memoKey, event.target.value);
       }
+    });
+    $("coachingRows").addEventListener("input", (event) => {
+      if (event.target.matches("[data-coaching-status-key][data-coaching-status-field]")) {
+        setCoachingStatusField(event.target.dataset.coachingStatusKey, event.target.dataset.coachingStatusField, event.target.value);
+      }
+    });
+    $("coachingRows").addEventListener("change", (event) => {
+      if (event.target.matches("[data-coaching-status-key][data-coaching-status-field]")) {
+        const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+        setCoachingStatusField(event.target.dataset.coachingStatusKey, event.target.dataset.coachingStatusField, value);
+      }
+    });
+    $("coachingRows").addEventListener("click", (event) => {
+      const deleteButton = event.target.closest("[data-coaching-delete]");
+      if (!deleteButton) return;
+      deleteCoachingRow(deleteButton.dataset.coachingDelete, deleteButton.dataset.coachingCompany);
     });
     $("companyRows").addEventListener("click", (event) => {
       const memoTrigger = event.target.closest("[data-memo-open]");
@@ -2543,11 +3236,13 @@
       if (event.key === "Escape") {
         $("csvModal").classList.remove("open");
         $("statsModal").classList.remove("open");
+        $("coachingModal").classList.remove("open");
       }
     });
 
     initAuth();
     loadInitialData();
+    loadCoachingSheet();
   </script>
 </body>
 </html>
